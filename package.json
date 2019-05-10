@@ -1,0 +1,42 @@
+{
+  "name": "Chob",
+  "version": "0.2",
+  "description": "An universal app search tool for Linux",
+  "engines": {
+    "node": ">= 10.13 <11"
+  },
+  "devDependencies": {
+    "@types/jest": "^23.3.12",
+    "@types/node": "^10.12.18",
+    "jest": "~23.6.0",
+    "prettier": "1.15.3",
+    "rimraf": "^2.6.3",
+    "ts-jest": "~23.10.5",
+    "tslib": "^1.9.3",
+    "tslint": "~5.12.0",
+    "tslint-config-prettier": "1.17.0",
+    "tslint-microsoft-contrib": "~6.0.0",
+    "tsutils": "~3.7.0",
+    "typescript": "^3.2.2",
+    "webpack": "^4.31.0",
+    "webpack-cli": "^3.3.2"
+  },
+  "scripts": {
+    "clean": "rimraf coverage build tmp",
+    "build": "tsc -p tsconfig.release.json",
+    "wp": "webpack",
+    "build:watch": "tsc -w -p tsconfig.release.json",
+    "lint": "tslint -t stylish --project \"tsconfig.json\"",
+    "test": "jest --coverage",
+    "test:watch": "jest --watch"
+  },
+  "author": "Muhammed Kaplan <mmuhammedkaplan0@gmail.com>",
+  "license": "Apache-2.0",
+  "dependencies": {
+    "chalk": "^2.4.2",
+    "commander": "^2.20.0",
+    "opener": "^1.5.1",
+    "prompt": "^1.0.0",
+    "request": "^2.88.0"
+  }
+}
