@@ -75,6 +75,8 @@ export function grabApplicationsFromApi() {
     serializedData = serializedData.concat(serializeAppImageData(appimageData))
 
     updateApplicationList(serializedData)
+
+    return resolve()
   })
 
 }
