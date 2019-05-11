@@ -26,7 +26,7 @@ export class ApiClient {
     }
 
 
-    grabDataSnapCraft(): Promise<snapStrucuure> {
+    grabDataFromSnap(): Promise<snapStrucuure> {
         return new Promise((resolve, reject) => {
              request.get(this.snapApi, (error, response, body) => {
                 if (error && response.statusCode !== 200) {

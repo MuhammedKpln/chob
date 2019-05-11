@@ -1,7 +1,7 @@
 export interface defaultStructure {
   name: string,
   type: number,
-  dest: string
+  src: string
 }
 
 export interface flathubStructure {

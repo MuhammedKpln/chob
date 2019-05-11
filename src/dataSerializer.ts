@@ -7,7 +7,7 @@ export function serializeFlathubData(data: flathubStructure) : Array<Object> {
         serializedData.push({
             name: app.name,
             type: 2,
-            dest: `https://flathub.org/apps/details/${app.flatpakAppId}`
+            src: `https://flathub.org/apps/details/${app.flatpakAppId}`
         })
     }
 
@@ -22,7 +22,7 @@ export function serializeSnapData(data: snapStrucuure) : Object[] {
         serializedData.push({
             name: app.title,
             type: 3,
-            dest: `https://snapcraft.io/${app.package_name}`
+            src: `https://snapcraft.io/${app.package_name}`
         })
     }
 
@@ -34,11 +34,11 @@ export function serializeSnapData(data: snapStrucuure) : Object[] {
 export function serializeAppImageData(data: appimageStructure) : Object[] {
     let serializedData: Object[] = [];
 
-    for (const app of data) {
+    for (const app of data.items) {
         serializedData.push({
-            name: app.title,
-            type: 3,
-            dest: `https://snapcraft.io/${app.package_name}`
+            name: app.name,
+            type: 1,
+            src: `https://appimage.github.io/${app.name}`
         })
     }
 
