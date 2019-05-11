@@ -36,7 +36,7 @@
     "chalk": "^2.4.2",
     "commander": "^2.20.0",
     "opener": "^1.5.1",
-    "prompt": "^1.0.0",
+    "prompts": "^2.0.4",
     "request": "^2.88.0"
   }
 }

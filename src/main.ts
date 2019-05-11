@@ -1,7 +1,7 @@
 import * as request from 'request'
 import * as open from 'opener'
 import * as chalk from 'chalk'
-import * as prompt from 'prompt'
+import * as prompt from 'prompts'
 import TYPES from './types'
 
 
@@ -35,32 +35,31 @@ export function search(userInput: String): any {
     }
 }
 
-function result(apps: Array<Object>): any {
+async function result(apps: Array<Object>): Promise<any> {
 
 
-    infoMessage(`Found ${apps.length} applications, please choose which one you want.`)
+    errorMessage(`Found ${apps.length} applications, please choose which one you want.`)
 
     for (let i = 0; i < apps.length; i++) {
         infoMessage(`${i}) ${apps[i]['name']} - ${TYPES[apps[i]['type']]}`)
     }
 
-    const promptSchemas = {
-        properties: {
-            appNumber: {
-                description: ' '
-            }
-        }
+
+
+    try {
+        const response = await prompt({
+            type: 'number',
+            name: 'value',
+            message: 'Select number of an application.',
+            validate: value => value > apps.length ? `Please select numbers between 0-${apps.length - 1}` : true
+        })
+
+
+        return openApplicationSource(apps[response.value])
+    } catch (error) {
+        errorMessage('Please select a valid application number.')
+        return false
     }
-
-    prompt.message = 'Select number of an application.'
-    prompt.start()
-
-
-
-    prompt.get(promptSchemas, (err, response) => {
-        return openApplicationSource(apps[response.appNumber])
-    })
-
 }
 
 export function grabApplicationsFromApi() {
