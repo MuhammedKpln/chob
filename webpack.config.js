@@ -7,7 +7,7 @@ module.exports = {
   devtool: './build/src/cli.js.map',
   output: {
     path: path.resolve(__dirname, 'dist'),
-    filename: 'appstore.bundle.js'
+    filename: 'chob.js'
   },
   module: {
     rules: [
