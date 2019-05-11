@@ -1,4 +1,4 @@
-import { flathubStructure, defaultStructure, snapStrucuure, appimageStructure } from './dataStructure';
+import { flathubStructure, snapStrucuure, appimageStructure } from './dataStructure';
 
 export function serializeFlathubData(data: flathubStructure) : Array<Object> {
     let serializedData: Object[] = [];

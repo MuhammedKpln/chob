@@ -1,6 +1,5 @@
 import * as request from 'request'
 import { flathubStructure, snapStrucuure, appimageStructure } from './dataStructure'
-import { serializeFlathubData, serializeSnapData } from './dataSerializer';
 
 export class ApiClient {
 
@@ -37,7 +36,7 @@ export class ApiClient {
                 this.snapData = JSON.parse(body)
                 return resolve(this.snapData)
             })
-            
+
         })
     }
 
@@ -48,26 +47,11 @@ export class ApiClient {
                     return reject(error)
                 }
 
-                this.snapData = JSON.parse(body)
-                return resolve(this.snapData)
+                this.appimageData = JSON.parse(body)
+                return resolve(this.appimageData)
             })
-            
+
         })
     }
 
 }
-
-const log = console.log
-const test = new ApiClient()
-
-
-async function testt() {
-    const sa = await test.grabDataAppImage()
-    log(sa)
-    // const serializer = serializeSnapData(sa)
-    // console.log(serializer)
-}
-
-
-
-testt()
