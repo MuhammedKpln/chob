@@ -10,9 +10,12 @@ Chob is an helper tool for searching application accross platforms (Flathub, Sna
 
 ## Usage
 
-1. Download executable file for your linux distro from [Releases][release] 
+1. Download executable file for your linux distro from [Releases][release]
+
+```sh
 2. chmod +x chob-linux
 3. ./chob-linux pkgName
+```
 
 ## Build instructions
 
