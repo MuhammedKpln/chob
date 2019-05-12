@@ -5,6 +5,7 @@
 [![APLv2][license-badge]][LICENSE]
 
 [![Donate][donate-badge]][donate]
+
 [![Chob usage][usageVideo][video]
 Chob is an helper tool for searching application accross platforms (Flathub, Snapcraft and AppImage)
 
@@ -55,4 +56,4 @@ Licensed under the APLv2. See the [LICENSE](https://github.com/jsynowiec/node-ty
 [tslint-microsoft-contrib]: https://github.com/Microsoft/tslint-microsoft-contrib
 [prettier]: https://prettier.io
 [release]: https://github.com/MuhammedKpln/chob/releases
-[usageVideo]: https://i.imgur.com/Qc6W0Ml.gif
+[usageVideo]: https://i.imgur.com/HkCrDvi.gif
