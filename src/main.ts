@@ -1,5 +1,5 @@
 import { ApiClient } from './apiClient'
-import { serializeSnapData, serializeAppImageData } from './dataSerializer'
+import { serializeSnapData, serializeAppImageData, serializeFlathubData } from './dataSerializer'
 import * as open from 'opener'
 import * as colors from 'colors'
 import * as prompt from 'prompts'
@@ -70,12 +70,18 @@ export function grabApplicationsFromApi() {
     try {
       const apiClient = new ApiClient()
 
-      const snapData = await apiClient.grabDataFromSnap()
-      let serializedData = serializeSnapData(snapData)
-
+      infoMessage('Searching on Appimage feed..')
       const appimageData = await apiClient.grabDataAppImage()
-      serializedData = serializedData.concat(serializeAppImageData(appimageData))
+      let serializedData = serializeAppImageData(appimageData)
 
+      infoMessage('Searching on Flathub..')
+      const flathubData = await apiClient.grabDataFromFlathub()
+      serializedData = serializedData.concat(serializeFlathubData(flathubData))
+
+      infoMessage('Searching on Snapcraft..')
+      const snapData = await apiClient.grabDataFromSnap()
+      serializedData = serializedData.concat(serializeSnapData(snapData))
+      
       updateApplicationList(serializedData)
 
       return resolve()
