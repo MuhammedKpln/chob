@@ -3,6 +3,8 @@ import * as colors from 'colors'
 import { grabApplicationsFromApi, search } from './main'
 import * as pkg from "../package.json"
 
+const helpText = () => colors.bgCyan.white.bold('Usage: chob pkgName')
+
 argparser.command('*')
   .action(env => {
     console.log(colors.bgGreen.white.bold(`🔎 Searching ${env} on repositories.`));
@@ -10,8 +12,11 @@ argparser.command('*')
       search(env.toLowerCase())
     })
   })
-argparser.help(() => {
-  return colors.bgMagenta.white.bold('Usage: chob pkgName')
-})
 argparser.version(pkg.version)
 argparser.parse(process.argv);
+
+if (!process.argv.slice(2).length) {
+  argparser.outputHelp(helpText);
+}
+
+
