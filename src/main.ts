@@ -1,16 +1,16 @@
 import { ApiClient } from './apiClient'
 import { serializeSnapData, serializeAppImageData } from './dataSerializer'
 import * as open from 'opener'
-import * as chalk from 'chalk'
+import * as colors from 'colors'
 import * as prompt from 'prompts'
 import TYPES from './types'
 
 
 let applicationList: Array<Object> = []
 
-const successfullMessage = message => console.log(chalk.bgGreen.bold(message))
-const errorMessage = message => console.log(chalk.bgRed.bold(message))
-const infoMessage = message => console.log(chalk.bgBlueBright.bold(message))
+const successfullMessage = message => console.log(colors.bgGreen.white.bold(message))
+const errorMessage = message => console.log(colors.bgRed.white.bold(message))
+const infoMessage = message => console.log(colors.bgBlue.white.bold(message))
 
 function updateApplicationList(applications: Array<Object>): void {
   applicationList = applications
