@@ -1,6 +1,6 @@
 {
   "name": "Chob",
-  "version": "0.2",
+  "version": "0.3",
   "description": "An universal app search tool for Linux",
   "engines": {
     "node": ">= 10.13 <11"
