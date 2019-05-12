@@ -5,6 +5,7 @@ export interface defaultStructure {
 }
 
 export interface flathubStructure {
+  [Symbol.iterator]
   flatpakAppId: string;
   name: string;
   summary: string;
@@ -22,6 +23,7 @@ export interface snapStrucuure {
 }
 
 export interface snapClickIndex {
+[Symbol.iterator]
   aliases: any;
   anon_download_url: string;
   apps: any[];
@@ -74,6 +76,7 @@ interface Link {
 }
 
 interface appimageSingleStructure {
+  [Symbol.iterator],
   name: string;
   description: string;
   categories: string[];

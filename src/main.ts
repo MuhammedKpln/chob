@@ -56,6 +56,7 @@ async function result(apps: Array<Object>): Promise<any> {
     })
 
 
+    successfullMessage(`Opening ${apps[response.value]['name']}`)
     return openApplicationSource(apps[response.value])
   } catch (error) {
     errorMessage('Please select a valid application number.')
@@ -66,17 +67,21 @@ async function result(apps: Array<Object>): Promise<any> {
 export function grabApplicationsFromApi() {
 
   return new Promise(async (resolve, reject) => {
-    const apiClient = new ApiClient()
+    try {
+      const apiClient = new ApiClient()
 
-    const snapData = await apiClient.grabDataFromSnap()
-    let serializedData = serializeSnapData(snapData)
+      const snapData = await apiClient.grabDataFromSnap()
+      let serializedData = serializeSnapData(snapData)
 
-    const appimageData = await apiClient.grabDataAppImage()
-    serializedData = serializedData.concat(serializeAppImageData(appimageData))
+      const appimageData = await apiClient.grabDataAppImage()
+      serializedData = serializedData.concat(serializeAppImageData(appimageData))
 
-    updateApplicationList(serializedData)
+      updateApplicationList(serializedData)
 
-    return resolve()
+      return resolve()
+    } catch (error) {
+      return reject(error)
+    }
   })
 
 }
