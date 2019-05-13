@@ -4,7 +4,7 @@ import { flathubStructure, snapStrucuure, appimageStructure } from './dataStruct
 export class ApiClient {
 
     private flathubApi = 'https://flathub.org/api/v1/apps/'
-    private snapApi = 'https://search.apps.ubuntu.com/api/v1/search'
+    private snapApi = 'https://raw.githubusercontent.com/MuhammedKpln/chob-snap-api/master/snapcraft.json'
     private appimageApi = 'https://appimage.github.io/feed.json'
 
     private flathubData;
