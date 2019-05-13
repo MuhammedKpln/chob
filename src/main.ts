@@ -70,7 +70,7 @@ export function grabApplicationsFromApi() {
     try {
       const apiClient = new ApiClient()
 
-      infoMessage('Searching on Appimage feed..')
+      infoMessage('Searching on AppImage feed..')
       const appimageData = await apiClient.grabDataAppImage()
       let serializedData = serializeAppImageData(appimageData)
 
