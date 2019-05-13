@@ -56,4 +56,4 @@ Licensed under the APLv2. See the [LICENSE](https://github.com/jsynowiec/node-ty
 [tslint-microsoft-contrib]: https://github.com/Microsoft/tslint-microsoft-contrib
 [prettier]: https://prettier.io
 [release]: https://github.com/MuhammedKpln/chob/releases
-[usageVideo]: https://i.imgur.com/HkCrDvi.gif
+[usageVideo]: https://i.imgur.com/8QOzGls.gif
