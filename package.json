@@ -2,6 +2,7 @@
   "name": "Chob",
   "version": "0.3",
   "description": "An universal app search tool for Linux",
+  "main": "build/src/cli.js",
   "engines": {
     "node": ">= 10.13 <11"
   },
@@ -28,7 +29,8 @@
     "build:watch": "tsc -w -p tsconfig.release.json",
     "lint": "tslint -t stylish --project \"tsconfig.json\"",
     "test": "jest --coverage",
-    "test:watch": "jest --watch"
+    "test:watch": "jest --watch",
+    "postinstall": "yarn build"
   },
   "author": "Muhammed Kaplan <mmuhammedkaplan0@gmail.com>",
   "license": "Apache-2.0",
