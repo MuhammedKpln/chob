@@ -1,11 +1,12 @@
 export interface defaultStructure {
-  name: string,
-  type: number,
-  src: string
+  name: string;
+  type: number;
+  src: string;
+  repoUrl?: string;
 }
 
 export interface flathubStructure {
-  [Symbol.iterator]
+  [Symbol.iterator];
   flatpakAppId: string;
   name: string;
   summary: string;
@@ -19,11 +20,11 @@ export interface flathubStructure {
 }
 
 export interface snapStrucuure {
-  _embedded: snapEmbedded
+  _embedded: snapEmbedded;
 }
 
 export interface snapClickIndex {
-[Symbol.iterator]
+  [Symbol.iterator];
   aliases: any;
   anon_download_url: string;
   apps: any[];
@@ -76,7 +77,7 @@ interface Link {
 }
 
 interface appimageSingleStructure {
-  [Symbol.iterator],
+  [Symbol.iterator];
   name: string;
   description: string;
   categories: string[];
@@ -88,16 +89,87 @@ interface appimageSingleStructure {
 }
 
 export interface appimageStructure {
-  version: number,
-  home_page_url: string,
-  feed_url: string,
-  description: string,
-  icon: string,
-  favicon: string,
-  expired:boolean,
-  items: appimageSingleStructure
+  version: number;
+  home_page_url: string;
+  feed_url: string;
+  description: string;
+  icon: string;
+  favicon: string;
+  expired: boolean;
+  items: appimageSingleStructure;
 }
 
 export interface snapEmbedded {
-  "clickindex:package": snapClickIndex
+  'clickindex:package': snapClickIndex;
+}
+
+export interface IGithubLatestReleases {
+  url: string;
+  assets_url: string;
+  upload_url: string;
+  html_url: string;
+  id: number;
+  node_id: string;
+  tag_name: string;
+  target_commitish: string;
+  name: string;
+  draft: boolean;
+  author: Author;
+  prerelease: boolean;
+  created_at: Date;
+  published_at: Date;
+  assets: Asset[];
+  tarball_url: string;
+  zipball_url: string;
+  body: string;
+}
+
+interface Asset {
+  url: string;
+  id: number;
+  node_id: string;
+  name: string;
+  label: null;
+  uploader: Author;
+  content_type: string;
+  state: string;
+  size: number;
+  download_count: number;
+  created_at: Date;
+  updated_at: Date;
+  browser_download_url: string;
+}
+
+interface Author {
+  login: string;
+  id: number;
+  node_id: string;
+  avatar_url: string;
+  gravatar_id: string;
+  url: string;
+  html_url: string;
+  followers_url: string;
+  following_url: string;
+  gists_url: string;
+  starred_url: string;
+  subscriptions_url: string;
+  organizations_url: string;
+  repos_url: string;
+  events_url: string;
+  received_events_url: string;
+  type: string;
+  site_admin: boolean;
+}
+
+export interface ITags {
+  name: string;
+  zipball_url: string;
+  tarball_url: string;
+  commit: Commit;
+  node_id: string;
+}
+
+interface Commit {
+  sha: string;
+  url: string;
 }
