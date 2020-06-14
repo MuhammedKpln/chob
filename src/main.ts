@@ -1,6 +1,6 @@
 import { defaultStructure } from './dataStructure';
 import { GithubApi } from './GithubApi';
-import { experimentalFeatures, cacheFeature } from './cli';
+import { experimentalFeatures, cacheFeature, forceUpdateCache } from './cli';
 import { errorMessage, infoMessage, successfullMessage } from './helpers'
 import { ApiClient } from './apiClient';
 import {
@@ -125,7 +125,7 @@ export function grabApplicationsFromApi() {
           snapData
         }
 
-        if (cacheManager.shouldUpdateCache()) {
+        if (cacheManager.shouldUpdateCache() || forceUpdateCache) {
           cacheManager.updateCache(updateCache)
         }
       }

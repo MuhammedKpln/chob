@@ -3,9 +3,11 @@ import { grabApplicationsFromApi, search } from './main';
 import * as pkg from '../package.json';
 import { infoMessage } from './helpers';
 import * as colors from 'colors';
+
 export let experimentalFeatures: boolean = false;
 export let cacheFeature: boolean = false
 export let updateInterval: number = 1
+export let forceUpdateCache: boolean = false
 
 
 const helpText = () => colors.bgCyan.white.bold('Usage: chob pkgName');
@@ -20,7 +22,7 @@ argparser
   .option('--enableExperiementalFeatures', 'Enables experiemental features')
   .option('--enableCache', 'Enables feature')
   .option('--updateInterval <number>', 'Update the cache in interval (Number expected. It will count as days.) ')
-
+  .option('--forceUpdateCache', 'Forcing cache to be up to dated.')
 
 argparser.version(pkg.version);
 argparser.parse(process.argv);
@@ -30,7 +32,7 @@ const args = process.argv.slice(2)
 if (args.length < 1) {
   argparser.outputHelp(helpText);
 } else {
-  const appName = argparser.args[0]
+  let appName = argparser.args[0]
   
   if (argparser.enableExperiementalFeatures) {
     experimentalFeatures = true;
@@ -44,6 +46,12 @@ if (args.length < 1) {
     cacheFeature = true;
   }
   
+  if(argparser.forceUpdateCache) {
+    appName = 'updating' 
+    cacheFeature = true
+    forceUpdateCache = true    
+  }
+
   searchApplication(appName);
 
 }
