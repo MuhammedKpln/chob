@@ -52,7 +52,7 @@ async function result(apps: Array<defaultStructure>): Promise<any> {
   );
 
   for (let i = 0; i < apps.length; i++) {
-    infoMessage(`${i}) ${apps[i]['name']} - ${TYPES[apps[i]['type']]}`);
+    infoMessage(`${i}) ${apps[i]['name']} (${apps[i]!['version'] || 'Unknown version'}) - ${TYPES[apps[i]['type']]}`);
   }
 
   try {
@@ -110,6 +110,7 @@ export function grabApplicationsFromApi() {
       infoMessage('Searching on AppImage feed..');
       const appimageData = await apiClient.grabDataAppImage();
       let serializedData = serializeAppImageData(appimageData);
+
 
       infoMessage('Searching on Flathub..');
       const flathubData = await apiClient.grabDataFromFlathub();

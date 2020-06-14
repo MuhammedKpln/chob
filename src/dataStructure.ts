@@ -96,11 +96,11 @@ export interface appimageStructure {
   icon: string;
   favicon: string;
   expired: boolean;
-  items: appimageSingleStructure;
+  items: appimageSingleStructure[];
 }
 
 export interface snapEmbedded {
-  'clickindex:package': snapClickIndex;
+  'clickindex:package': snapClickIndex[];
 }
 
 export interface IGithubLatestReleases {

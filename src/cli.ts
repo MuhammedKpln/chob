@@ -5,28 +5,36 @@ import * as pkg from '../package.json';
 
 export let experimentalFeatures: boolean = false;
 
+
 const helpText = () => colors.bgCyan.white.bold('Usage: chob pkgName');
 const searchApplication = env => {
+  const appName = env.args[0]
   console.log(
-    colors.bgGreen.white.bold(`🔎 Searching ${env} on repositories.`),
+    colors.bgGreen.white.bold(`🔎 Searching ${appName} on repositories.`),
   );
   grabApplicationsFromApi().then(() => {
-    search(env.toLowerCase());
+    search(appName.toLowerCase());
   });
 };
 
 argparser
   .option('--enableExperiementalFeatures', 'Enables experiemental features')
   .action((appName, args) => {
-    if (args.enableExperiementalFeatures) {
-      experimentalFeatures = true;
+    if(args) {
+      if (args.enableExperiementalFeatures) {
+        experimentalFeatures = true;
+      }
+      searchApplication(appName);
     }
-    searchApplication(appName);
+
   });
+
 
 argparser.version(pkg.version);
 argparser.parse(process.argv);
 
-if (!process.argv.slice(2).length) {
+const args = process.argv.slice(2)
+
+if (args.length < 1) {
   argparser.outputHelp(helpText);
 }

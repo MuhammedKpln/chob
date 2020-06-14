@@ -20,7 +20,7 @@ export class ApiClient {
   private appimageData;
 
   async get(url: string | Object): Promise<any> {
-    return new Promise((resolve, reject) => {
+    return new Promise( async (resolve, reject) => {
       request.get(url, (error, response, body) => {
         if (error && response.statusCode !== 200) {
           return reject(error);
@@ -48,6 +48,7 @@ export class ApiClient {
       return false;
     }
     const file = fs.createWriteStream(filePath);
+
     request
       .get({
         url: url,
@@ -69,7 +70,7 @@ export class ApiClient {
     return true;
   }
 
-  grabDataFromFlathub(): Promise<flathubStructure> {
+  grabDataFromFlathub(): Promise<flathubStructure[]> {
     return new Promise((resolve, reject) => {
       request.get(this.flathubApi, (error, response, body) => {
         if (error && response.statusCode !== 200) {

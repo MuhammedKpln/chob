@@ -4,7 +4,7 @@ import {
   appimageStructure,
 } from './dataStructure';
 
-export function serializeFlathubData(data: flathubStructure): Array<Object> {
+export function serializeFlathubData(data: flathubStructure[]): Object[] {
   let serializedData: Object[] = [];
 
   for (const app of data) {
@@ -12,6 +12,7 @@ export function serializeFlathubData(data: flathubStructure): Array<Object> {
       name: app.name,
       type: 2,
       src: `https://flathub.org/apps/details/${app.flatpakAppId}`,
+      version: app.currentReleaseVersion
     });
   }
 
@@ -26,6 +27,7 @@ export function serializeSnapData(data: snapStrucuure): Object[] {
       name: app.title,
       type: 3,
       src: `https://snapcraft.io/${app.package_name}`,
+      version: app.version
     });
   }
 
