@@ -1,6 +1,6 @@
 {
   "name": "chob",
-  "version": "0.5",
+  "version": "0.6",
   "description": "An universal app search tool for Linux",
   "main": "./build/src/cli.js",
   "bin": {
