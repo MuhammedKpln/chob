@@ -12,8 +12,10 @@ import * as util from 'util';
 import { pipeline } from 'stream'
 import { cacheFeature } from './cli';
 import CacheManager from './cacheManager';
-const streamPipeline = util.promisify(pipeline)
 
+
+const streamPipeline = util.promisify(pipeline)
+const cacheManager = new CacheManager()
 
 
 export class ApiClient {
@@ -75,7 +77,6 @@ export class ApiClient {
     return new Promise(async (resolve, reject) => {
 
       if (cacheFeature) {
-        const cacheManager = new CacheManager()
         const { flathubData } = cacheManager.getSourcesFromCache()
 
         return resolve(flathubData)
@@ -97,7 +98,6 @@ export class ApiClient {
     return new Promise((resolve, reject) => {
 
       if (cacheFeature) {
-        const cacheManager = new CacheManager()
         const { snapData } = cacheManager.getSourcesFromCache()
 
         return resolve(snapData)
@@ -119,7 +119,6 @@ export class ApiClient {
     return new Promise((resolve, reject) => {
 
       if (cacheFeature) {
-        const cacheManager = new CacheManager()
         const { appimageData } = cacheManager.getSourcesFromCache()
 
         return resolve(appimageData)
