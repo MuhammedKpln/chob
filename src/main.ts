@@ -1,6 +1,6 @@
 import { defaultStructure } from './dataStructure';
 import { GithubApi } from './GithubApi';
-import { experimentalFeatures } from './cli';
+import { experimentalFeatures, cacheFeature, forceAction } from './cli';
 import { ApiClient } from './apiClient';
 import {
   serializeSnapData,
@@ -10,7 +10,8 @@ import {
 import * as open from 'opener';
 import * as colors from 'colors';
 import * as prompt from 'prompts';
-import {TYPES, getTypeNm} from './types';
+import { TYPES, getTypeNm } from './types';
+import CacheManager from './cacheManager';
 
 let applicationList: Array<Object> = [];
 export const successfullMessage = message =>
@@ -67,7 +68,7 @@ async function result(apps: Array<defaultStructure>): Promise<any> {
     });
 
     if (experimentalFeatures && apps[response.value].type === getTypeNm.appimage) {
-      if(  apps[response.value]['repoUrl']) {
+      if (apps[response.value]['repoUrl']) {
         infoMessage('Downloading AppImage automatically...')
         installAppImage(<defaultStructure>apps[response.value]);
       } else {
@@ -91,9 +92,9 @@ async function installAppImage(app: defaultStructure) {
   const apiClient = new ApiClient();
 
   let downloadUrl: string
-  if(latestRelease){
+  if (latestRelease) {
     infoMessage('Found latest release trying to download...')
-    for(const asset of latestRelease.assets) {
+    for (const asset of latestRelease.assets) {
       downloadUrl = asset?.browser_download_url
     }
     return apiClient.download(downloadUrl, app.name)
@@ -118,6 +119,20 @@ export function grabApplicationsFromApi() {
       infoMessage('Searching on Snapcraft..');
       const snapData = await apiClient.grabDataFromSnap();
       serializedData = serializedData.concat(serializeSnapData(snapData));
+
+
+      if (cacheFeature) {
+        const cacheManager = new CacheManager()
+        const updateCache = {
+          appimageData,
+          flathubData,
+          snapData
+        }
+
+        if (cacheManager.shouldUpdateCache()) {
+          cacheManager.updateCache(updateCache)
+        }
+      }
 
       updateApplicationList(serializedData);
 
