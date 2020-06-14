@@ -2,6 +2,7 @@ import * as path from 'path'
 import * as os from 'os'
 import * as fs from 'fs'
 import { flathubStructure, snapStrucuure, appimageStructure } from './dataStructure'
+import { updateInterval } from './cli'
 
 
 interface ICacheManager {
@@ -25,13 +26,14 @@ export default class CacheManager implements ICacheManager {
     private updatedAtFilePath: string
     private updateCacheInterval: number
 
+
     constructor() {
         this.cacheLocation = path.resolve(os.homedir(), 'chob');
         this.flathubCachePath = path.resolve(this.cacheLocation, '.flathub.json');
         this.snapCachePath = path.resolve(this.cacheLocation, '.snap.json');
         this.appimageCachePath = path.resolve(this.cacheLocation, '.appimage.json');
         this.updatedAtFilePath = path.resolve(this.cacheLocation, '.updatedAt');
-        this.updateCacheInterval = 1
+        this.updateCacheInterval = updateInterval
 
         if (!this.checkCacheFiles()) {
             this.createCacheFiles()

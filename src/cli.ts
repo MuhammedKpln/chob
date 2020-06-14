@@ -5,6 +5,7 @@ import * as pkg from '../package.json';
 
 export let experimentalFeatures: boolean = false;
 export let cacheFeature: boolean = false
+export let updateInterval: number = 1
 
 const helpText = () => colors.bgCyan.white.bold('Usage: chob pkgName');
 const searchApplication = appName => {
@@ -19,7 +20,7 @@ const searchApplication = appName => {
 argparser
   .option('--enableExperiementalFeatures', 'Enables experiemental features')
   .option('--enableCache', 'Enables feature')
-  .option('--force', 'Force action')
+  .option('--updateInterval <number>', 'Update the cache in interval (Number expected. It will count as days.) ')
 
 
 argparser.version(pkg.version);
@@ -31,9 +32,14 @@ if (args.length < 1) {
   argparser.outputHelp(helpText);
 } else {
   const appName = argparser.args[0]
-
+  
   if (argparser.enableExperiementalFeatures) {
     experimentalFeatures = true;
+  }
+  console.log(argparser.updateInterval)
+
+  if (argparser.updateInterval) {
+    updateInterval = argparser.updateInterval;
   }
 
   if (argparser.enableCache) {
