@@ -5,7 +5,6 @@ import * as pkg from '../package.json';
 
 export let experimentalFeatures: boolean = false;
 export let cacheFeature: boolean = false
-export let forceAction: boolean = false
 
 const helpText = () => colors.bgCyan.white.bold('Usage: chob pkgName');
 const searchApplication = appName => {
@@ -41,12 +40,6 @@ if (args.length < 1) {
     cacheFeature = true;
   }
   
-  if (argparser.force) {
-    forceAction = true;
-  }
-
-  
-
   searchApplication(appName);
 
 }

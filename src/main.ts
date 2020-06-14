@@ -1,6 +1,6 @@
 import { defaultStructure } from './dataStructure';
 import { GithubApi } from './GithubApi';
-import { experimentalFeatures, cacheFeature, forceAction } from './cli';
+import { experimentalFeatures, cacheFeature } from './cli';
 import { ApiClient } from './apiClient';
 import {
   serializeSnapData,
