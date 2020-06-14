@@ -1,6 +1,7 @@
 import { defaultStructure } from './dataStructure';
 import { GithubApi } from './GithubApi';
 import { experimentalFeatures, cacheFeature } from './cli';
+import { errorMessage, infoMessage, successfullMessage } from './helpers'
 import { ApiClient } from './apiClient';
 import {
   serializeSnapData,
@@ -8,16 +9,11 @@ import {
   serializeFlathubData,
 } from './dataSerializer';
 import * as open from 'opener';
-import * as colors from 'colors';
 import * as prompt from 'prompts';
 import { TYPES, getTypeNm } from './types';
 import CacheManager from './cacheManager';
 
 let applicationList: Array<Object> = [];
-export const successfullMessage = message =>
-  console.log(colors.bgGreen.white.bold(message));
-export const errorMessage = message => console.log(colors.bgRed.white.bold(message));
-const infoMessage = message => console.log(colors.bgBlue.white.bold(message));
 
 function updateApplicationList(applications: Array<Object>): void {
   applicationList = applications;

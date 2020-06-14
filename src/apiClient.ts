@@ -1,4 +1,4 @@
-import { errorMessage, successfullMessage } from './main';
+import { errorMessage, successfullMessage } from './helpers';
 const fetch = require('node-fetch').default
 import {
   flathubStructure,
@@ -11,11 +11,11 @@ import * as path from 'path';
 import * as util from 'util';
 import { pipeline } from 'stream'
 import { cacheFeature } from './cli';
-import CacheManager from './cacheManager';
+import  CacheManager, { ICacheManager } from './cacheManager';
 
 
 const streamPipeline = util.promisify(pipeline)
-const cacheManager = new CacheManager()
+
 
 
 export class ApiClient {
@@ -27,6 +27,16 @@ export class ApiClient {
   private flathubData;
   private snapData;
   private appimageData;
+  private cacheManager: ICacheManager;
+
+  constructor() {
+    this.cacheManager = new CacheManager()
+
+    if (!this.cacheManager.hasCachedSources) {
+      errorMessage('⚡ Could not find any cached sources, your search will be cached after this results.')
+    }
+
+  }
 
   async get(url: string, options: Object = {}): Promise<Response> {
     return new Promise(async (resolve, reject) => {
@@ -76,8 +86,8 @@ export class ApiClient {
   grabDataFromFlathub(): Promise<flathubStructure[]> {
     return new Promise(async (resolve, reject) => {
 
-      if (cacheFeature) {
-        const { flathubData } = cacheManager.getSourcesFromCache()
+      if (cacheFeature && this.cacheManager.hasCachedSources) {
+        const { flathubData } = this.cacheManager.getSourcesFromCache()
 
         return resolve(flathubData)
       }
@@ -97,8 +107,8 @@ export class ApiClient {
   grabDataFromSnap(): Promise<snapStrucuure> {
     return new Promise((resolve, reject) => {
 
-      if (cacheFeature) {
-        const { snapData } = cacheManager.getSourcesFromCache()
+      if (cacheFeature && this.cacheManager.hasCachedSources) {
+        const { snapData } = this.cacheManager.getSourcesFromCache()
 
         return resolve(snapData)
       }
@@ -117,9 +127,8 @@ export class ApiClient {
 
   grabDataAppImage(): Promise<appimageStructure> {
     return new Promise((resolve, reject) => {
-
-      if (cacheFeature) {
-        const { appimageData } = cacheManager.getSourcesFromCache()
+      if (cacheFeature && this.cacheManager.hasCachedSources) {
+        const { appimageData } = this.cacheManager.getSourcesFromCache()
 
         return resolve(appimageData)
       }

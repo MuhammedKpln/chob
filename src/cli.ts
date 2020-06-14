@@ -1,17 +1,16 @@
 import * as argparser from 'commander';
-import * as colors from 'colors';
 import { grabApplicationsFromApi, search } from './main';
 import * as pkg from '../package.json';
-
+import { infoMessage } from './helpers';
+import * as colors from 'colors';
 export let experimentalFeatures: boolean = false;
 export let cacheFeature: boolean = false
 export let updateInterval: number = 1
 
+
 const helpText = () => colors.bgCyan.white.bold('Usage: chob pkgName');
 const searchApplication = appName => {
-  console.log(
-    colors.bgGreen.white.bold(`🔎 Searching ${appName} on repositories.`),
-  );
+  infoMessage(`🔎 Searching ${appName} on repositories.`)
   grabApplicationsFromApi().then(() => {
     search(appName.toLowerCase());
   });
@@ -36,7 +35,6 @@ if (args.length < 1) {
   if (argparser.enableExperiementalFeatures) {
     experimentalFeatures = true;
   }
-  console.log(argparser.updateInterval)
 
   if (argparser.updateInterval) {
     updateInterval = argparser.updateInterval;

@@ -3,12 +3,13 @@ import * as os from 'os'
 import * as fs from 'fs'
 import { flathubStructure, snapStrucuure, appimageStructure } from './dataStructure'
 import { updateInterval } from './cli'
+import { successfullMessage } from './helpers'
 
-
-interface ICacheManager {
+export interface ICacheManager {
     shouldUpdateCache: () => boolean
     updateCache: (data: IUpdateCacheObject) => boolean | Error
     getSourcesFromCache: () => IUpdateCacheObject
+    hasCachedSources: boolean
 }
 
 interface IUpdateCacheObject extends Object {
@@ -25,6 +26,7 @@ export default class CacheManager implements ICacheManager {
     private appimageCachePath: string
     private updatedAtFilePath: string
     private updateCacheInterval: number
+    hasCachedSources: boolean
 
 
     constructor() {
@@ -35,9 +37,16 @@ export default class CacheManager implements ICacheManager {
         this.updatedAtFilePath = path.resolve(this.cacheLocation, '.updatedAt');
         this.updateCacheInterval = updateInterval
 
+        if (!fs.existsSync(this.cacheLocation)) {
+            fs.mkdirSync(this.cacheLocation)
+        }
+
         if (!this.checkCacheFiles()) {
             this.createCacheFiles()
         }
+
+        this.hasCachedSources = this.checkHasCachedSources()
+
 
     }
 
@@ -62,6 +71,9 @@ export default class CacheManager implements ICacheManager {
             fs.writeFileSync(this.snapCachePath, JSON.stringify(snapData))
             fs.writeFileSync(this.appimageCachePath, JSON.stringify(appimageData))
             fs.writeFileSync(this.updatedAtFilePath, Date.now().toString())
+
+            successfullMessage('⚡ Created cache, your results will now pull from cached sources! ⚡')
+
             return true
 
         } catch (err) {
@@ -86,6 +98,16 @@ export default class CacheManager implements ICacheManager {
 
     }
 
+    private checkHasCachedSources(): boolean {
+        const flathubData: flathubStructure[] = JSON.parse(fs.readFileSync(this.flathubCachePath).toString())
+
+        if (Object.keys(flathubData).length > 0) {
+            return true
+        }
+
+        return false
+
+    }
 
     private checkCacheFiles(): boolean {
         const flathubFile = fs.existsSync(this.flathubCachePath)
