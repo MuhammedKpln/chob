@@ -19,14 +19,13 @@ export class GithubApi {
     this.repoUrl = `${githubApi}/repos/${userName}/${userRepo}/releases/latest`;
 
     const options = {
-      url: this.repoUrl,
       headers: {
         'User-Agent': userAgent,
       },
     };
-    const data: string = await apiClient.get(options);
-
-    return JSON.parse(data);
+    const request: Response = await apiClient.get(this.repoUrl, options);
+    const data = await request.json() 
+    return data;
   }
 
   async getTags(): Promise<ITags[]> {
@@ -34,13 +33,13 @@ export class GithubApi {
     this.repoUrl = `${githubApi}/repos/${userName}/${userRepo}/tags`;
 
     const options = {
-      url: this.repoUrl,
       headers: {
         'User-Agent': userAgent,
       },
     };
-    const data = await apiClient.get(options);
+    const request: Response = await apiClient.get(this.repoUrl, options);
+    const data = await request.json() 
 
-    return JSON.parse(data);
+    return data
   }
 }

@@ -111,7 +111,6 @@ export function grabApplicationsFromApi() {
       const appimageData = await apiClient.grabDataAppImage();
       let serializedData = serializeAppImageData(appimageData);
 
-
       infoMessage('Searching on Flathub..');
       const flathubData = await apiClient.grabDataFromFlathub();
       serializedData = serializedData.concat(serializeFlathubData(flathubData));

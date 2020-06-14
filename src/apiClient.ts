@@ -1,5 +1,5 @@
 import { errorMessage, successfullMessage } from './main';
-import * as request from 'request';
+const fetch = require('node-fetch').default
 import {
   flathubStructure,
   snapStrucuure,
@@ -8,6 +8,11 @@ import {
 import * as fs from 'fs';
 import * as os from 'os';
 import * as path from 'path';
+import * as util from 'util';
+import { pipeline } from 'stream'
+const streamPipeline = util.promisify(pipeline)
+
+
 
 export class ApiClient {
   private flathubApi = 'https://flathub.org/api/v1/apps/';
@@ -19,15 +24,14 @@ export class ApiClient {
   private snapData;
   private appimageData;
 
-  async get(url: string | Object): Promise<any> {
-    return new Promise( async (resolve, reject) => {
-      request.get(url, (error, response, body) => {
-        if (error && response.statusCode !== 200) {
-          return reject(error);
-        }
+  async get(url: string, options: Object = {}): Promise<Response> {
+    return new Promise(async (resolve, reject) => {
+      const response: Response = await fetch(url, options)
+      if (response.status !== 200) {
+        return reject(response)
+      }
 
-        return resolve(body);
-      });
+      return resolve(response)
     });
   }
 
@@ -41,71 +45,72 @@ export class ApiClient {
       fs.mkdirSync(path.resolve(os.homedir(), 'chob'));
     }
 
-    if (!fs.existsSync(filePath)) {
-      fs.writeFileSync(filePath, '');
-    } else {
+    if (fs.existsSync(filePath)) {
       errorMessage(`You already have downloaded this file in ${homeFolder}`);
       return false;
-    }
+    } 
+    fs.writeFileSync(filePath, '');
+
     const file = fs.createWriteStream(filePath);
 
-    request
-      .get({
-        url: url,
-        followAllRedirects: true,
-      })
-      .pipe(file)
-      .on('finish', () => {
-        successfullMessage(
-          `Your download is finished, it is stored at ${filePath}`,
-        );
-        return true;
-      })
-      .on('error', e => {
-        errorMessage('Could not download the app image.');
-        console.error(e);
-        return false;
-      });
+    const response = await this.get(url)
 
-    return true;
+    //@ts-ignore
+    return streamPipeline(response.body, file).then(() => {
+      successfullMessage(
+        `Your download is finished, it is stored at ${filePath}`,
+      );
+
+      return true
+    }).catch(() => {
+      errorMessage('Could not download the app image.');
+      return false
+    })
+
   }
 
   grabDataFromFlathub(): Promise<flathubStructure[]> {
-    return new Promise((resolve, reject) => {
-      request.get(this.flathubApi, (error, response, body) => {
-        if (error && response.statusCode !== 200) {
-          return reject(error);
-        }
+    return new Promise(async (resolve, reject) => {
 
-        this.flathubData = JSON.parse(body);
-        return resolve(this.flathubData);
-      });
+      this.get(this.flathubApi).then(resp => {
+        return resp.json()
+      }).then(json => {
+        this.flathubData = json
+        return resolve(this.flathubData)
+      }).catch(err => {
+        return reject(err)
+      })
+
     });
   }
 
   grabDataFromSnap(): Promise<snapStrucuure> {
     return new Promise((resolve, reject) => {
-      request.get(this.snapApi, (error, response, body) => {
-        if (error && response.statusCode !== 200) {
-          return reject(error);
-        }
 
-        this.snapData = JSON.parse(body);
-        return resolve(this.snapData);
-      });
+      this.get(this.snapApi).then(resp => {
+        return resp.json()
+      }).then(json => {
+        this.snapData = json
+        return resolve(this.snapData)
+      }).catch(err => {
+        return reject(err)
+      })
+
     });
   }
 
   grabDataAppImage(): Promise<appimageStructure> {
     return new Promise((resolve, reject) => {
-      request.get(this.appimageApi, (error, response, body) => {
-        if (error && response.statusCode !== 200) {
-          return reject(error);
-        }
 
-        this.appimageData = JSON.parse(body);
-        return resolve(this.appimageData);
-      });
+      this.get(this.appimageApi).then(resp => {
+        return resp.json()
+      }).then(json => {
+        this.appimageData = json
+        return resolve(this.appimageData)
+      }).catch(err => {
+        return reject(err)
+      })
+
     });
   }
 }

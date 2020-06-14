@@ -18,7 +18,10 @@
     "noImplicitAny": false,
     "noImplicitThis": false,
     "strictNullChecks": false,
-    "resolveJsonModule": true
+    "resolveJsonModule": true,
+    "types": [
+      "node-fetch"
+    ]
     },
   "include": [
     "src/**/*",

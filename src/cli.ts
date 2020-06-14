@@ -7,8 +7,7 @@ export let experimentalFeatures: boolean = false;
 
 
 const helpText = () => colors.bgCyan.white.bold('Usage: chob pkgName');
-const searchApplication = env => {
-  const appName = env.args[0]
+const searchApplication = appName => {
   console.log(
     colors.bgGreen.white.bold(`🔎 Searching ${appName} on repositories.`),
   );
@@ -19,22 +18,28 @@ const searchApplication = env => {
 
 argparser
   .option('--enableExperiementalFeatures', 'Enables experiemental features')
-  .action((appName, args) => {
-    if(args) {
-      if (args.enableExperiementalFeatures) {
-        experimentalFeatures = true;
-      }
-      searchApplication(appName);
-    }
 
-  });
+
+
 
 
 argparser.version(pkg.version);
 argparser.parse(process.argv);
 
+
+
+
+// console.log(argparser.enableExperiementalFeatures)
+
 const args = process.argv.slice(2)
 
 if (args.length < 1) {
   argparser.outputHelp(helpText);
+} else {
+  const appName = argparser.args[0]
+  if (argparser.enableExperiementalFeatures) {
+    experimentalFeatures = true;
+  }
+  searchApplication(appName);
+
 }
