@@ -32,7 +32,7 @@ export class ApiClient {
   constructor() {
     this.cacheManager = new CacheManager()
 
-    if (!this.cacheManager.hasCachedSources) {
+    if (cacheFeature && !this.cacheManager.hasCachedSources) {
       errorMessage('⚡ Could not find any cached sources, your search will be cached after this results.')
     }
 

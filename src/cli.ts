@@ -1,14 +1,15 @@
 import * as argparser from 'commander';
 import { grabApplicationsFromApi, search } from './main';
 import * as pkg from '../package.json';
-import { infoMessage } from './helpers';
+import { infoMessage, successfullMessage } from './helpers';
 import * as colors from 'colors';
+import CacheManager from './cacheManager';
 
+const cache = new CacheManager()
 export let experimentalFeatures: boolean = false;
-export let cacheFeature: boolean = false
+export let cacheFeature: boolean = cache.isCacheEnabled || false
 export let updateInterval: number = 1
 export let forceUpdateCache: boolean = false
-
 
 const helpText = () => colors.bgCyan.white.bold('Usage: chob pkgName');
 const searchApplication = appName => {
@@ -20,7 +21,8 @@ const searchApplication = appName => {
 
 argparser
   .option('--enableExperiementalFeatures', 'Enables experiemental features')
-  .option('--enableCache', 'Enables feature')
+  .option('--enableCache', 'Enables cache feature')
+  .option('--disableCache', 'Disables cache feature')
   .option('--updateInterval <number>', 'Update the cache in interval (Number expected. It will count as days.) ')
   .option('--forceUpdateCache', 'Forcing cache to be up to dated.')
 
@@ -40,10 +42,19 @@ if (args.length < 1) {
 
   if (argparser.updateInterval) {
     updateInterval = argparser.updateInterval;
+    successfullMessage('⚡ Updated cache updating interval with ' + updateInterval)
+    cache.updateInterval(updateInterval)
   }
 
   if (argparser.enableCache) {
+    successfullMessage('⚡ Your cache will now be enabled.')
     cacheFeature = true;
+    cache.updateCacheStatment(true)
+  }
+  
+  if (argparser.disableCache) {
+    successfullMessage('⚡ Your cache will now be disabled.')
+    cache.updateCacheStatment(false)
   }
   
   if(argparser.forceUpdateCache) {

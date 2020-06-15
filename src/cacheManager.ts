@@ -2,20 +2,27 @@ import * as path from 'path'
 import * as os from 'os'
 import * as fs from 'fs'
 import { flathubStructure, snapStrucuure, appimageStructure } from './dataStructure'
-import { updateInterval } from './cli'
 import { successfullMessage } from './helpers'
 
 export interface ICacheManager {
     shouldUpdateCache: () => boolean
     updateCache: (data: IUpdateCacheObject) => boolean | Error
     getSourcesFromCache: () => IUpdateCacheObject
+    updateCacheStatment: (statment: boolean) => boolean
+    updateInterval: (interval: number) => boolean
     hasCachedSources: boolean
+    isCacheEnabled: boolean
 }
 
 interface IUpdateCacheObject extends Object {
     flathubData: flathubStructure[]
     snapData: snapStrucuure
     appimageData: appimageStructure
+}
+
+interface IConfig extends Object {
+    enabled: boolean
+    interval: number
 }
 
 export default class CacheManager implements ICacheManager {
@@ -26,6 +33,9 @@ export default class CacheManager implements ICacheManager {
     private appimageCachePath: string
     private updatedAtFilePath: string
     private updateCacheInterval: number
+    private configPath: string
+    private config: IConfig
+    isCacheEnabled: boolean
     hasCachedSources: boolean
 
 
@@ -35,7 +45,8 @@ export default class CacheManager implements ICacheManager {
         this.snapCachePath = path.resolve(this.cacheLocation, '.snap.json');
         this.appimageCachePath = path.resolve(this.cacheLocation, '.appimage.json');
         this.updatedAtFilePath = path.resolve(this.cacheLocation, '.updatedAt');
-        this.updateCacheInterval = updateInterval
+        this.configPath = path.resolve(this.cacheLocation, 'config.json');
+
 
         if (!fs.existsSync(this.cacheLocation)) {
             fs.mkdirSync(this.cacheLocation)
@@ -45,9 +56,35 @@ export default class CacheManager implements ICacheManager {
             this.createCacheFiles()
         }
 
+        this.config = this.parseConfig()
+        this.isCacheEnabled = this.config.enabled
+        this.updateCacheInterval = this.config.interval || 1
+
+
         this.hasCachedSources = this.checkHasCachedSources()
 
 
+    }
+
+    updateInterval(interval: number): boolean {
+        this.config.interval = interval
+
+        try {
+            fs.writeFileSync(this.configPath, JSON.stringify(this.config))
+            return true
+        } catch (err) {
+            return false
+        }
+    }
+
+    updateCacheStatment(statment: boolean): boolean {
+        this.config.enabled = statment
+        try {
+            fs.writeFileSync(this.configPath, JSON.stringify(this.config))
+            return true
+        } catch (err) {
+            return false
+        }
     }
 
     getSourcesFromCache(): IUpdateCacheObject {
@@ -98,6 +135,11 @@ export default class CacheManager implements ICacheManager {
 
     }
 
+    private parseConfig(): IConfig {
+        const configFile = fs.readFileSync(this.configPath).toString()
+        return JSON.parse(configFile)
+    }
+
     private checkHasCachedSources(): boolean {
         const flathubData: flathubStructure[] = JSON.parse(fs.readFileSync(this.flathubCachePath).toString())
 
@@ -114,8 +156,9 @@ export default class CacheManager implements ICacheManager {
         const snapFile = fs.existsSync(this.snapCachePath)
         const appimageFile = fs.existsSync(this.appimageCachePath)
         const updateFile = fs.existsSync(this.updatedAtFilePath)
+        const configPath = fs.existsSync(this.configPath)
 
-        if (flathubFile && snapFile && appimageFile && updateFile) {
+        if (flathubFile && snapFile && appimageFile && updateFile && configPath) {
             return true
         }
 
@@ -130,6 +173,7 @@ export default class CacheManager implements ICacheManager {
             fs.writeFileSync(this.snapCachePath, data)
             fs.writeFileSync(this.appimageCachePath, data)
             fs.writeFileSync(this.updatedAtFilePath, '')
+            fs.writeFileSync(this.configPath, data)
 
 
             return true
