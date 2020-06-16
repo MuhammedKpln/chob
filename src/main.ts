@@ -65,8 +65,14 @@ async function result(apps: Array<defaultStructure>): Promise<any> {
 
     if (experimentalFeatures && apps[response.value].type === getTypeNm.appimage) {
       if (apps[response.value]['repoUrl']) {
-        infoMessage('Downloading AppImage automatically...')
-        installAppImage(<defaultStructure>apps[response.value]);
+
+        if(await askForInstallation()) {
+          infoMessage('Downloading AppImage automatically...')
+          installAppImage(<defaultStructure>apps[response.value]);  
+        } else {
+          successfullMessage(`Opening ${apps[response.value]['name']}`);
+          return openApplicationSource(apps[response.value]);
+        }
       } else {
         errorMessage('Could not find a download url for this file.')
         return false;
@@ -82,6 +88,23 @@ async function result(apps: Array<defaultStructure>): Promise<any> {
   }
 }
 
+async function askForInstallation(): Promise<boolean> {
+  const test = await prompt({
+    type: 'confirm',
+    name: 'value',
+    message: 'Do you want to install appimage automatically?',
+    initial: true,
+  })
+
+  if(!test.value) {
+    return false
+  }
+
+  return true
+  
+
+}
+
 async function installAppImage(app: defaultStructure) {
   const api = new GithubApi(app?.repoUrl);
   const latestRelease = await api.getTheLatestRelease();
@@ -91,7 +114,9 @@ async function installAppImage(app: defaultStructure) {
   if (latestRelease) {
     infoMessage('Found latest release trying to download...')
     for (const asset of latestRelease.assets) {
-      downloadUrl = asset?.browser_download_url
+      if(asset?.name.endsWith('.AppImage')) {
+        downloadUrl = asset?.browser_download_url
+      }
     }
     return apiClient.download(downloadUrl, app.name)
   }
