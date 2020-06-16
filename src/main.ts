@@ -129,6 +129,11 @@ export function grabApplicationsFromApi() {
     try {
       const apiClient = new ApiClient();
 
+      if(!cacheFeature) {
+        infoMessage('\n ⚡ Complaining about slow search results? Try caching results by adding --enableCache argument at the end of your command! \n')
+      }
+
+
       infoMessage('Searching on AppImage feed..');
       const appimageData = await apiClient.grabDataAppImage();
       let serializedData = serializeAppImageData(appimageData);
