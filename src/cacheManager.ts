@@ -21,8 +21,8 @@ interface IUpdateCacheObject extends Object {
 }
 
 interface IConfig extends Object {
-    enabled: boolean
-    interval: number
+    cacheEnabled: boolean
+    chacheUpdateInterval: number
 }
 
 export default class CacheManager implements ICacheManager {
@@ -57,8 +57,8 @@ export default class CacheManager implements ICacheManager {
         }
 
         this.config = this.parseConfig()
-        this.isCacheEnabled = this.config.enabled
-        this.updateCacheInterval = this.config.interval || 1
+        this.isCacheEnabled = this.config.cacheEnabled
+        this.updateCacheInterval = this.config.chacheUpdateInterval || 1
 
 
         this.hasCachedSources = this.checkHasCachedSources()
@@ -67,7 +67,7 @@ export default class CacheManager implements ICacheManager {
     }
 
     updateInterval(interval: number): boolean {
-        this.config.interval = interval
+        this.config.chacheUpdateInterval = interval
 
         try {
             fs.writeFileSync(this.configPath, JSON.stringify(this.config))
@@ -78,7 +78,7 @@ export default class CacheManager implements ICacheManager {
     }
 
     updateCacheStatment(statment: boolean): boolean {
-        this.config.enabled = statment
+        this.config.cacheEnabled = statment
         try {
             fs.writeFileSync(this.configPath, JSON.stringify(this.config))
             return true
