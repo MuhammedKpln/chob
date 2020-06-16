@@ -1,4 +1,4 @@
-import { errorMessage, successfullMessage } from './main';
+import { errorMessage, successfullMessage } from './helpers';
 const fetch = require('node-fetch').default
 import {
   flathubStructure,
@@ -10,6 +10,10 @@ import * as os from 'os';
 import * as path from 'path';
 import * as util from 'util';
 import { pipeline } from 'stream'
+import { cacheFeature } from './cli';
+import  CacheManager, { ICacheManager } from './cacheManager';
+
+
 const streamPipeline = util.promisify(pipeline)
 
 
@@ -23,6 +27,16 @@ export class ApiClient {
   private flathubData;
   private snapData;
   private appimageData;
+  private cacheManager: ICacheManager;
+
+  constructor() {
+    this.cacheManager = new CacheManager()
+
+    if (cacheFeature && !this.cacheManager.hasCachedSources) {
+      errorMessage('⚡ Could not find any cached sources, your search will be cached after this results.')
+    }
+
+  }
 
   async get(url: string, options: Object = {}): Promise<Response> {
     return new Promise(async (resolve, reject) => {
@@ -48,7 +62,7 @@ export class ApiClient {
     if (fs.existsSync(filePath)) {
       errorMessage(`You already have downloaded this file in ${homeFolder}`);
       return false;
-    } 
+    }
     fs.writeFileSync(filePath, '');
 
     const file = fs.createWriteStream(filePath);
@@ -72,6 +86,12 @@ export class ApiClient {
   grabDataFromFlathub(): Promise<flathubStructure[]> {
     return new Promise(async (resolve, reject) => {
 
+      if (cacheFeature && this.cacheManager.hasCachedSources) {
+        const { flathubData } = this.cacheManager.getSourcesFromCache()
+
+        return resolve(flathubData)
+      }
+
       this.get(this.flathubApi).then(resp => {
         return resp.json()
       }).then(json => {
@@ -87,6 +107,12 @@ export class ApiClient {
   grabDataFromSnap(): Promise<snapStrucuure> {
     return new Promise((resolve, reject) => {
 
+      if (cacheFeature && this.cacheManager.hasCachedSources) {
+        const { snapData } = this.cacheManager.getSourcesFromCache()
+
+        return resolve(snapData)
+      }
+
       this.get(this.snapApi).then(resp => {
         return resp.json()
       }).then(json => {
@@ -101,6 +127,11 @@ export class ApiClient {
 
   grabDataAppImage(): Promise<appimageStructure> {
     return new Promise((resolve, reject) => {
+      if (cacheFeature && this.cacheManager.hasCachedSources) {
+        const { appimageData } = this.cacheManager.getSourcesFromCache()
+
+        return resolve(appimageData)
+      }
 
       this.get(this.appimageApi).then(resp => {
         return resp.json()
