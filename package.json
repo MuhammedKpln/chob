@@ -1,6 +1,6 @@
 {
   "name": "chob",
-  "version": "0.8",
+  "version": "0.7",
   "description": "An universal app search tool for Linux",
   "main": "./build/src/cli.js",
   "bin": {
@@ -43,6 +43,7 @@
     "commander": "^5.1.0",
     "node-fetch": "^2.6.0",
     "opener": "^1.5.1",
-    "prompts": "^2.0.4"
+    "prompts": "^2.0.4",
+    "yargs": "^15.3.1"
   }
 }

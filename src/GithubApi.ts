@@ -1,47 +1,50 @@
-import { IGithubLatestReleases, ITags } from './dataStructure';
 import { ApiClient } from './apiClient';
+import { IApiClient, IGithubApi, IGithubLatestReleases, ITags } from './dataStructure';
 
-
-export class GithubApi {
+/**
+ * Helper class for making github requests
+ * @class GithubApi
+ */
+export class GithubApi implements IGithubApi {
   private repoUrl: string;
   private userName: string;
   private userRepo: string;
-  private apiClient
-  private githubApi: string = 'https://api.github.com';
-  private userAgent: string =
-    'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.149 Safari/537.36';
+  private apiClient: IApiClient;
+  private githubApi: string;
+  private userAgent: string;
 
   constructor(repoUrl: string) {
     this.userName = repoUrl.split('/')[3];
     this.userRepo = repoUrl.split('/')[4];
-    this.apiClient = new ApiClient()
+    this.githubApi = 'https://api.github.com';
+    this.userAgent = 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.149 Safari/537.36';
+
+    this.apiClient = new ApiClient();
   }
-  async getTheLatestRelease(): Promise<IGithubLatestReleases> {
-    const { githubApi, userName, userRepo, userAgent } = this;
-    this.repoUrl = `${githubApi}/repos/${userName}/${userRepo}/releases/latest`;
+
+  public async getTheLatestRelease(): Promise<IGithubLatestReleases> {
+    this.repoUrl = `${this.githubApi}/repos/${this.userName}/${this.userRepo}/releases/latest`;
 
     const options = {
       headers: {
-        'User-Agent': userAgent,
+        'User-Agent': this.userAgent,
       },
     };
-    const request: Response = await this.apiClient.get(this.repoUrl, options);
-    const data = await request.json() 
-    return data;
+    const request = await this.apiClient.get(this.repoUrl, options);
+
+    return request.json();
   }
 
-  async getTags(): Promise<ITags[]> {
-    const { githubApi, userName, userRepo, userAgent } = this;
-    this.repoUrl = `${githubApi}/repos/${userName}/${userRepo}/tags`;
+  public async getTags(): Promise<ITags[]> {
+    this.repoUrl = `${this.githubApi}/repos/${this.userName}/${this.userRepo}/tags`;
 
     const options = {
       headers: {
-        'User-Agent': userAgent,
+        'User-Agent': this.userAgent,
       },
     };
-    const request: Response = await this.apiClient.get(this.repoUrl, options);
-    const data = await request.json() 
+    const request = await this.apiClient.get(this.repoUrl, options);
 
-    return data
+    return request.json();
   }
 }

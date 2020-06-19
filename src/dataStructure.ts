@@ -1,11 +1,14 @@
-export interface defaultStructure {
+import { Response } from 'node-fetch';
+
+export interface IApp {
   name: string;
   type: number;
   src: string;
   repoUrl?: string;
+  version?: string
 }
 
-export interface flathubStructure {
+export interface IFlathub {
   [Symbol.iterator];
   flatpakAppId: string;
   name: string;
@@ -19,11 +22,11 @@ export interface flathubStructure {
   ratingVotes: number;
 }
 
-export interface snapStrucuure {
-  _embedded: snapEmbedded;
+export interface ISnap {
+  _embedded: ISnapEmbedded;
 }
 
-export interface snapClickIndex {
+export interface ISnapClickIndex {
   [Symbol.iterator];
   aliases: any;
   anon_download_url: string;
@@ -66,29 +69,24 @@ export interface snapClickIndex {
   version: string;
   website: string;
 }
-interface Author {
-  name: string;
-  url: string;
-}
-
-interface Link {
+interface ILink {
   type: string;
   url: string;
 }
 
-interface appimageSingleStructure {
+interface IAppImageSingle {
   [Symbol.iterator];
   name: string;
   description: string;
   categories: string[];
-  authors: Author[];
+  authors: IAuthor[];
   license?: any;
-  links: Link[];
+  links: ILink[];
   icons: string[];
   screenshots: string[];
 }
 
-export interface appimageStructure {
+export interface IAppImage {
   version: number;
   home_page_url: string;
   feed_url: string;
@@ -96,11 +94,11 @@ export interface appimageStructure {
   icon: string;
   favicon: string;
   expired: boolean;
-  items: appimageSingleStructure[];
+  items: IAppImageSingle[];
 }
 
-export interface snapEmbedded {
-  'clickindex:package': snapClickIndex[];
+export interface ISnapEmbedded {
+  'clickindex:package': ISnapClickIndex[];
 }
 
 export interface IGithubLatestReleases {
@@ -114,23 +112,23 @@ export interface IGithubLatestReleases {
   target_commitish: string;
   name: string;
   draft: boolean;
-  author: Author;
+  author: IAuthor;
   prerelease: boolean;
   created_at: Date;
   published_at: Date;
-  assets: Asset[];
+  assets: IAsset[];
   tarball_url: string;
   zipball_url: string;
   body: string;
 }
 
-interface Asset {
+interface IAsset {
   url: string;
   id: number;
   node_id: string;
   name: string;
   label: null;
-  uploader: Author;
+  uploader: IAuthor;
   content_type: string;
   state: string;
   size: number;
@@ -140,7 +138,7 @@ interface Asset {
   browser_download_url: string;
 }
 
-interface Author {
+interface IAuthor {
   login: string;
   id: number;
   node_id: string;
@@ -165,11 +163,47 @@ export interface ITags {
   name: string;
   zipball_url: string;
   tarball_url: string;
-  commit: Commit;
+  commit: ICommit;
   node_id: string;
 }
 
-interface Commit {
+interface ICommit {
   sha: string;
   url: string;
+}
+
+
+export interface IApiClient {
+  get(url: string, options?: Object): Promise<Response>
+  download(url: string, fileName: string): Promise<boolean>
+  grabDataFromFlathub(): Promise<IFlathub[]>
+  grabDataFromSnap(): Promise<ISnap>
+  grabDataAppImage(): Promise<IAppImage>
+}
+
+export interface IGithubApi {
+  getTheLatestRelease(): Promise<IGithubLatestReleases>
+
+  getTags(): Promise<ITags[]>
+}
+
+export interface ICacheManager {
+  hasCachedSources: boolean
+  isCacheEnabled: boolean
+  shouldUpdateCache(): boolean
+  updateCache(data: IUpdateCacheObject): boolean | Error
+  getSourcesFromCache(): IUpdateCacheObject
+  updateCacheStatment(statment: boolean): boolean
+  updateInterval(interval: number): boolean
+}
+
+export interface IUpdateCacheObject extends Object {
+  flathubData: IFlathub[]
+  snapData: ISnap
+  appimageData: IAppImage
+}
+
+export interface IConfig extends Object {
+  cacheEnabled: boolean
+  chacheUpdateInterval: number
 }

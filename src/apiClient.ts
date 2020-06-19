@@ -1,59 +1,62 @@
-import { errorMessage, successfullMessage } from './helpers';
-const fetch = require('node-fetch').default
-import {
-  flathubStructure,
-  snapStrucuure,
-  appimageStructure,
-} from './dataStructure';
 import * as fs from 'fs';
+import { FetchError, Response } from 'node-fetch';
 import * as os from 'os';
 import * as path from 'path';
+import { pipeline } from 'stream';
 import * as util from 'util';
-import { pipeline } from 'stream'
+import { CacheManager } from './cacheManager';
 import { cacheFeature } from './cli';
-import  CacheManager, { ICacheManager } from './cacheManager';
+import { IAppImage, IFlathub, IApiClient, ICacheManager, ISnap } from './dataStructure';
+import { errorMessage, successfullMessage } from './helpers';
+
+const fetch = require('node-fetch').default;
 
 
-const streamPipeline = util.promisify(pipeline)
+const streamPipeline = util.promisify(pipeline);
 
+/**
+ * A wrapper for node-fetch library.
+ * @class ApiClient
+ */
+export class ApiClient implements IApiClient {
+  private flathubApi: string;
+  private snapApi: string;
+  private appimageApi: string;
 
-
-export class ApiClient {
-  private flathubApi = 'https://flathub.org/api/v1/apps/';
-  private snapApi =
-    'https://raw.githubusercontent.com/MuhammedKpln/chob-snap-api/master/snapcraft.json';
-  private appimageApi = 'https://appimage.github.io/feed.json';
-
-  private flathubData;
-  private snapData;
-  private appimageData;
+  private flathubData: IFlathub[];
+  private snapData: ISnap;
+  private appimageData: IAppImage;
   private cacheManager: ICacheManager;
 
   constructor() {
-    this.cacheManager = new CacheManager()
+    this.cacheManager = new CacheManager();
+    this.flathubApi = 'https://flathub.org/api/v1/apps/';
+    this.snapApi = 'https://raw.githubusercontent.com/MuhammedKpln/chob-snap-api/master/snapcraft.json';
+    this.appimageApi = 'https://appimage.github.io/feed.json';
+
 
     if (cacheFeature && !this.cacheManager.hasCachedSources) {
-      errorMessage('⚡ Could not find any cached sources, your search will be cached after this results.')
+      errorMessage('⚡ Could not find any cached sources, your search will be cached after this results.');
     }
 
   }
 
-  async get(url: string, options: Object = {}): Promise<Response> {
+  public async get(url: string, options: Object = {}): Promise<Response> {
     return new Promise(async (resolve, reject) => {
-      const response: Response = await fetch(url, options)
+      const response: Response = await fetch(url, options);
       if (response.status !== 200) {
-        return reject(response)
+        return reject(response);
       }
 
-      return resolve(response)
+      return resolve(response);
     });
   }
 
-  async download(url: string, fileName: string): Promise<boolean> {
+  public async download(url: string, fileName: string): Promise<boolean> {
     const homeFolder = path.resolve(os.homedir(), 'chob');
     const filePath = path.resolve(
       homeFolder,
-      `${fileName.toLowerCase()}.AppImage`,
+      `${fileName.toLowerCase()}`,
     );
     if (!fs.existsSync(homeFolder)) {
       fs.mkdirSync(path.resolve(os.homedir(), 'chob'));
@@ -61,86 +64,90 @@ export class ApiClient {
 
     if (fs.existsSync(filePath)) {
       errorMessage(`You already have downloaded this file in ${homeFolder}`);
+
       return false;
     }
     fs.writeFileSync(filePath, '');
 
     const file = fs.createWriteStream(filePath);
 
-    const response = await this.get(url)
+    const response = await this.get(url);
 
-    //@ts-ignore
     return streamPipeline(response.body, file).then(() => {
       successfullMessage(
         `Your download is finished, it is stored at ${filePath}`,
       );
 
-      return true
+      return true;
     }).catch(() => {
       errorMessage('Could not download the app image.');
-      return false
-    })
+
+      return false;
+    });
 
   }
 
-  grabDataFromFlathub(): Promise<flathubStructure[]> {
+  public grabDataFromFlathub(): Promise<IFlathub[]> {
     return new Promise(async (resolve, reject) => {
 
       if (cacheFeature && this.cacheManager.hasCachedSources) {
-        const { flathubData } = this.cacheManager.getSourcesFromCache()
+        const { flathubData } = this.cacheManager.getSourcesFromCache();
 
-        return resolve(flathubData)
+        return resolve(flathubData);
       }
 
-      this.get(this.flathubApi).then(resp => {
-        return resp.json()
-      }).then(json => {
-        this.flathubData = json
-        return resolve(this.flathubData)
-      }).catch(err => {
-        return reject(err)
-      })
+      this.get(this.flathubApi).then((resp: Response) => {
+        return resp.json();
+      }).then((json: IFlathub[]) => {
+        this.flathubData = json;
+
+        return resolve(this.flathubData);
+      }).catch((err: FetchError) => {
+        return reject(err);
+      });
 
     });
   }
 
-  grabDataFromSnap(): Promise<snapStrucuure> {
-    return new Promise((resolve, reject) => {
+  public grabDataFromSnap(): Promise<ISnap> {
+    return new Promise<ISnap>((resolve, reject) => {
 
       if (cacheFeature && this.cacheManager.hasCachedSources) {
-        const { snapData } = this.cacheManager.getSourcesFromCache()
+        const { snapData } = this.cacheManager.getSourcesFromCache();
 
-        return resolve(snapData)
+        return resolve(snapData);
       }
 
-      this.get(this.snapApi).then(resp => {
-        return resp.json()
-      }).then(json => {
-        this.snapData = json
-        return resolve(this.snapData)
-      }).catch(err => {
-        return reject(err)
-      })
+      this.get(this.snapApi).then((resp: Response) => {
+        return resp.json();
+      }).then((json: ISnap) => {
+        this.snapData = json;
+
+        return resolve(this.snapData);
+      }).catch((err: FetchError) => {
+        return reject(err);
+      });
 
     });
   }
 
-  grabDataAppImage(): Promise<appimageStructure> {
+  public grabDataAppImage(): Promise<IAppImage> {
     return new Promise((resolve, reject) => {
       if (cacheFeature && this.cacheManager.hasCachedSources) {
-        const { appimageData } = this.cacheManager.getSourcesFromCache()
+        const { appimageData } = this.cacheManager.getSourcesFromCache();
 
-        return resolve(appimageData)
+        return resolve(appimageData);
       }
 
-      this.get(this.appimageApi).then(resp => {
-        return resp.json()
-      }).then(json => {
-        this.appimageData = json
-        return resolve(this.appimageData)
-      }).catch(err => {
-        return reject(err)
-      })
+      this.get(this.appimageApi).then((resp: Response) => {
+        return resp.json();
+      }).then((json: IAppImage) => {
+        this.appimageData = json;
+
+        return resolve(this.appimageData);
+      }).catch((err: FetchError) => {
+        return reject(err);
+      });
 
     });
   }

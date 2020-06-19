@@ -1,33 +1,29 @@
-import { defaultStructure } from './dataStructure';
-import { GithubApi } from './GithubApi';
-import { experimentalFeatures, cacheFeature, forceUpdateCache } from './cli';
-import { errorMessage, infoMessage, successfullMessage } from './helpers'
-import { ApiClient } from './apiClient';
-import {
-  serializeSnapData,
-  serializeAppImageData,
-  serializeFlathubData,
-} from './dataSerializer';
 import * as open from 'opener';
 import * as prompt from 'prompts';
-import { TYPES, getTypeNm } from './types';
-import CacheManager from './cacheManager';
+import { ApiClient } from './apiClient';
+import { CacheManager } from './cacheManager';
+import { cacheFeature, experimentalFeatures, forceUpdateCache } from './cli';
+import { serializeAppImageData, serializeFlathubData, serializeSnapData } from './dataSerializer';
+import { IApp } from './dataStructure';
+import { GithubApi } from './GithubApi';
+import { errorMessage, infoMessage, successfullMessage } from './helpers';
+import { getTypeNm, TYPES } from './types';
 
-let applicationList: Array<Object> = [];
+let applicationList: IApp[] = [];
 
-function updateApplicationList(applications: Array<Object>): void {
+function updateApplicationList(applications: IApp[]): void {
   applicationList = applications;
 }
 
-function openApplicationSource(app: Object): boolean | void {
-  return open(app['src']);
+function openApplicationSource(app: IApp): boolean | void {
+  return open(app.src);
 }
-export function search(userInput: String): any {
+export async function search(userInput: String): Promise<boolean> {
   const appsToBeOpened = [];
   for (const app of applicationList) {
     // === userinput
     if (
-      String(app['name'])
+      String(app.name)
         .toLowerCase()
         .includes(String(userInput))
     ) {
@@ -39,17 +35,18 @@ export function search(userInput: String): any {
     return result(appsToBeOpened);
   } else {
     errorMessage(`Couldn't find any package with name of ${userInput}`);
+
     return false;
   }
 }
 
-async function result(apps: Array<defaultStructure>): Promise<any> {
+async function result(apps: IApp[]): Promise<any> {
   errorMessage(
     `Found ${apps.length} applications, please choose which one you want.`,
   );
 
   for (let i = 0; i < apps.length; i++) {
-    infoMessage(`${i}) ${apps[i]['name']} (${apps[i]!['version'] || 'Unknown version'}) - ${TYPES[apps[i]['type']]}`);
+    infoMessage(`${i}) ${apps[i].name} (${apps[i]!.version || 'Unknown version'}) - ${TYPES[apps[i].type]}`);
   }
 
   try {
@@ -57,33 +54,37 @@ async function result(apps: Array<defaultStructure>): Promise<any> {
       type: 'number',
       name: 'value',
       message: 'Select number of an application.',
-      validate: value =>
+      validate: (value: number) =>
         value > apps.length
           ? `Please select numbers between 0-${apps.length - 1}`
           : true,
     });
 
     if (experimentalFeatures && apps[response.value].type === getTypeNm.appimage) {
-      if (apps[response.value]['repoUrl']) {
+      if (apps[response.value].repoUrl) {
 
         if(await askForInstallation()) {
           infoMessage('Downloading AppImage automatically...')
-          installAppImage(<defaultStructure>apps[response.value]);  
+          await installAppImage(<IApp>apps[response.value]);
         } else {
-          successfullMessage(`Opening ${apps[response.value]['name']}`);
+          successfullMessage(`Opening ${apps[response.value].name}`);
+
           return openApplicationSource(apps[response.value]);
         }
       } else {
         errorMessage('Could not find a download url for this file.')
+
         return false;
       }
     } else {
-      successfullMessage(`Opening ${apps[response.value]['name']}`);
+      successfullMessage(`Opening ${apps[response.value].name}`);
+
       return openApplicationSource(apps[response.value]);
 
     }
   } catch (error) {
     errorMessage('Please select a valid application number.');
+
     return false;
   }
 }
@@ -101,11 +102,11 @@ async function askForInstallation(): Promise<boolean> {
   }
 
   return true
-  
+
 
 }
 
-async function installAppImage(app: defaultStructure) {
+async function installAppImage(app: IApp) {
   const api = new GithubApi(app?.repoUrl);
   const latestRelease = await api.getTheLatestRelease();
   const apiClient = new ApiClient();
@@ -118,7 +119,8 @@ async function installAppImage(app: defaultStructure) {
         downloadUrl = asset?.browser_download_url
       }
     }
-    return apiClient.download(downloadUrl, app.name)
+
+    return apiClient.download(downloadUrl, `${app.name}.AppImage`)
   }
 
   return false
@@ -132,11 +134,11 @@ export function grabApplicationsFromApi() {
       if(!cacheFeature) {
         infoMessage('\n ⚡ Complaining about slow search results? Try caching results by adding --enableCache argument at the end of your command! \n')
       }
+      let serializedData: IApp[]
 
-
-      infoMessage('Searching on AppImage feed..');
+        infoMessage('Searching on AppImage feed..');
       const appimageData = await apiClient.grabDataAppImage();
-      let serializedData = serializeAppImageData(appimageData);
+      serializedData = serializeAppImageData(appimageData);
 
       infoMessage('Searching on Flathub..');
       const flathubData = await apiClient.grabDataFromFlathub();
