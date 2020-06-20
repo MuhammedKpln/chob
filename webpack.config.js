@@ -1,3 +1,4 @@
+const webpack = require('webpack')
 const path = require('path');
 
 module.exports = {
@@ -7,11 +8,14 @@ module.exports = {
   devtool: './build/src/cli.js.map',
   output: {
     path: path.resolve(__dirname, 'dist'),
-    filename: 'chob.js'
+    filename: 'chob.js',
   },
   module: {
     rules: [
-      { test: /\.ts$/, use: 'ts-loader' }
-    ]
-  }
+      { test: /\.ts$/, use: 'ts-loader' },
+    ],
+  },
+  plugins: [
+    new webpack.BannerPlugin({ banner: '#!/usr/bin/env node', raw: true }),
+  ],
 };
