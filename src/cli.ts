@@ -8,6 +8,7 @@ import { UpdateManager } from './updateManager';
 
 
 const cache = new CacheManager();
+const updateManager = new UpdateManager();
 export let experimentalFeatures: boolean = false;
 export let cacheFeature: boolean = cache.isCacheEnabled || false;
 export let updateInterval: number = 1;
@@ -21,19 +22,31 @@ const searchApplication = (appName: string) => {
     await search(appName.toLowerCase());
   });
 };
+
+
 const checkForUpdate = async () => {
-  const updateManager = new UpdateManager();
   const isUpdated = await updateManager.isUpdated();
 
-  if (!isUpdated) {
-    await updateManager.updateChob();
-  }
+  if(!isUpdated) {
+    infoMessage(`There is a new version for chob! To download it use ${colors.bold('chob update now')}`)
 
+    return true
+  }
+  successfullMessage('Yay! You are using the latest version!')
+
+  return false
 };
+
+const update = async () => {
+  if(await checkForUpdate()) {
+    await updateManager.updateChob()
+  }
+}
 
 
 export const argv = yargs
-  .command('update', 'Update the chob module', checkForUpdate)
+  .command('check', 'Check for updates', checkForUpdate)
+  .command('update', 'Update the chob utility.', update)
   .options({
       eex: {
         alias: 'enableExperiementalFeatures',
@@ -74,10 +87,14 @@ export const argv = yargs
   .usage(helpText())
   .argv;
 
-if (argv._.length > 0) {
-  searchApplication(argv._[0]);
+const appNameArg = argv._[0]
+
+if (argv._.length > 0 && appNameArg !== 'check' && appNameArg !== 'update' ) {
+  searchApplication(appNameArg);
 } else {
-  console.log(helpText());
+  if (appNameArg !== 'check' && appNameArg !== 'update') {
+    console.log(helpText());
+  }
 }
 
 if (argv.enableExperiementalFeatures || argv.eex) {
