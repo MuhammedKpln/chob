@@ -15,4 +15,4 @@ async function scrapper() {
 }
 
 
-scrapper().then(r => console.log('ok'))
+scrapper().then(() => console.log('ok'))
