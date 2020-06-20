@@ -1,5 +1,5 @@
-import { ApiClient } from './apiClient'
-import * as fs from 'fs'
+import * as fs from 'fs';
+import { ApiClient } from './apiClient';
 
 
 const apiClient = new ApiClient()
@@ -15,4 +15,4 @@ async function scrapper() {
 }
 
 
-scrapper()
+scrapper().then(r => console.log('ok'))

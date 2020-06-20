@@ -31,7 +31,7 @@ export class ApiClient implements IApiClient {
   constructor() {
     this.cacheManager = new CacheManager();
     this.flathubApi = 'https://flathub.org/api/v1/apps/';
-    this.snapApi = 'https://raw.githubusercontent.com/MuhammedKpln/chob-snap-api/master/snapcraft.json';
+    this.snapApi = 'https://raw.githubusercontent.com/MuhammedKpln/chob/master/snapcraft.json';
     this.appimageApi = 'https://appimage.github.io/feed.json';
 
 

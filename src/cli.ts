@@ -74,9 +74,10 @@ export const argv = yargs
   .usage(helpText())
   .argv;
 
-
-if (argv._[0]) {
+if (argv._.length > 0) {
   searchApplication(argv._[0]);
+} else {
+  console.log(helpText());
 }
 
 if (argv.enableExperiementalFeatures || argv.eex) {
