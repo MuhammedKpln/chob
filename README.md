@@ -25,7 +25,8 @@ This project is intended to be used with the latest Active LTS release of [Node.
 ```sh
 git clone https://github.com/MuhammedKpln/chob.git
 cd chob
-npm install && yarn
+yarn OR npm install
+yarn build:watch OR npm run build:watch
 ```
 ## Available scripts
 
@@ -40,9 +41,9 @@ npm install && yarn
 ## License
 Licensed under the APLv2. See the [LICENSE](https://github.com/jsynowiec/node-typescript-boilerplate/blob/master/LICENSE) file for details.
 
-[ts-badge]: https://img.shields.io/badge/TypeScript-3.4-blue.svg
-[nodejs-badge]: https://img.shields.io/badge/Node.js->=%2010.13-blue.svg
-[nodejs]: https://nodejs.org/dist/latest-v10.x/docs/api/
+[ts-badge]: https://img.shields.io/npm/dependency-version/typescript/dev/typescript
+[nodejs-badge]: https://img.shields.io/badge/Node.js-%2012.18.1-blue.svg
+[nodejs]: https://nodejs.org/docs/latest-v12.x/api/index.html
 [travis-badge]: https://travis-ci.org/jsynowiec/node-typescript-boilerplate.svg?branch=master
 [typescript]: https://www.typescriptlang.org/
 [typescript-34]: https://www.typescriptlang.org/docs/handbook/release-notes/typescript-3-4.html
