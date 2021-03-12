@@ -1,0 +1,44 @@
+from typing import Any, Dict, List, TypedDict
+
+
+class Snap(TypedDict):
+    aliases: None
+    anon_download_url: str
+    apps: List[str]
+    architecture: List[str]
+    binary_filesize: int
+    channel: str
+    common_ids: List[int]
+    confinement: str
+    contact: str
+    content: str
+    date_published: str
+    deltas: List[Any]
+    description: str
+    developer_id: str
+    developer_name: str
+    developer_validation: str
+    download_sha3_384: str
+    download_sha512: str
+    download_url: str
+    epoch: int
+    gated_snap_ids: List[int]
+    icon_url: str
+    last_updated: str
+    license: str
+    name: str
+    origin: str
+    package_name: str
+    prices: List
+    private: bool
+    publisher: str
+    ratings_average: int
+    release: List[int]
+    revision: int
+    screenshot_urls: List[str]
+    snap_id: str
+    summary: str
+    support_url: str
+    title: str
+    version: str
+    website: str
