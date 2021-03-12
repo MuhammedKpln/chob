@@ -75,7 +75,7 @@ class Main:
             user_input = int(input('Select an application code: '))
             app = self.founded_apps[user_input]
 
-            if self.experiemental_features and app["type"] == Types.APPIMAGE:
+            if app["type"] == Types.APPIMAGE:
                 if (self.ask_for_installation()):
                     info_message('Downloading AppImage automatically...')
                     if app['repo_url']:

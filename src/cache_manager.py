@@ -113,7 +113,7 @@ class CacheManager:
 
     def __check_has_cached_sources(self) -> bool:
         with open(self.__flathub_cache_path, 'r') as f:
-            data = f.read()
+            data = loads(f.read())
 
             if len(data) > 0:
                 f.close()
