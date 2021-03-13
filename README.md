@@ -12,13 +12,13 @@ Chob is an helper tool for searching application accross platforms (Flathub, Sna
 1. Download executable file for your linux distro from [Releases][release]
 
 ```sh
-2. chmod +x chob-linux
-3. ./chob-linux pkgName
+2. chmod +x chob
+3. ./chob pkgName
 ```
 
 ## License
 
-Licensed under the APLv2. See the [LICENSE](https://github.com/jsynowiec/node-typescript-boilerplate/blob/master/LICENSE) file for details.
+Licensed under the Apache-2.0. See the [LICENSE](https://github.com/jsynowiec/node-typescript-boilerplate/blob/master/LICENSE) file for details.
 
 [license-badge]: https://img.shields.io/badge/license-APLv2-blue.svg
 [license]: https://github.com/MuhammedKpln/chob/blob/master/LICENSE
