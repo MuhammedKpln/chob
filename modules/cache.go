@@ -11,7 +11,7 @@ import (
 )
 
 func CreateCache(FileName string, Data []byte, ForceCreate *bool) {
-	var File string = path.Join(helpers.ChobPath(), "chob")
+	var File string = path.Join(helpers.ChobPath(), FileName)
 
 	log.Println("Writing cache: ", FileName)
 	if _, err := os.Stat(File); os.IsNotExist(err) || *ForceCreate {
@@ -25,15 +25,15 @@ func CreateCache(FileName string, Data []byte, ForceCreate *bool) {
 }
 
 func CacheIsExist(CacheType types.Type) bool {
-	var File string = path.Join(helpers.ChobPath(), "chob")
+	var File string = path.Join(helpers.ChobPath())
 
 	switch CacheType {
 	case types.AppImageType:
-		File = path.Join(File, "appimage.json")
+		File = path.Join(File, ".appimage.json")
 	case types.FlatpakType:
-		File = path.Join(File, "flatpak.json")
+		File = path.Join(File, ".flathub.json")
 	case types.SnapType:
-		File = path.Join(File, "snap.json")
+		File = path.Join(File, ".snap.json")
 	}
 
 	_, err := os.Stat(File)
@@ -63,16 +63,16 @@ func CachesExists() bool {
 }
 
 func LoadCache(CacheType types.Type) []byte {
-	var File string = path.Join(helpers.ChobPath(), "chob")
+	var File string = path.Join(helpers.ChobPath())
 
 	switch CacheType {
 	case types.AppImageType:
-		File = path.Join(File, "appimage.json")
+		File = path.Join(File, ".appimage.json")
 
 	case types.FlatpakType:
-		File = path.Join(File, "flatpak.json")
+		File = path.Join(File, ".flathub.json")
 	case types.SnapType:
-		File = path.Join(File, "snap.json")
+		File = path.Join(File, ".snap.json")
 	}
 
 	file, err := os.ReadFile(File)

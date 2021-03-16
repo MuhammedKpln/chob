@@ -12,6 +12,8 @@ import (
 	"strconv"
 	"strings"
 	"sync"
+
+	"github.com/fatih/color"
 )
 
 var AppImages = make(chan types.AppImage)
@@ -72,7 +74,10 @@ func FetchFlatpaks(wg *sync.WaitGroup) {
 
 	Flatpaks <- apps
 
-	CreateCache("flatpak.json", data, CacheEnabled)
+	if *CacheEnabled {
+		CreateCache(".flathub.json", data, CacheEnabled)
+	}
+
 	close(Flatpaks)
 	defer wg.Done()
 }
@@ -95,7 +100,10 @@ func FetchSnaps(wg *sync.WaitGroup) {
 
 	Snaps <- apps
 
-	CreateCache("snap.json", data, CacheEnabled)
+	if *CacheEnabled {
+		CreateCache(".snap.json", data, CacheEnabled)
+	}
+
 	close(Snaps)
 	defer wg.Done()
 }
@@ -117,7 +125,9 @@ func FetchAppImages(wg *sync.WaitGroup) {
 	json.Unmarshal(data, &apps)
 	AppImages <- apps
 
-	CreateCache("appimage.json", data, CacheEnabled)
+	if *CacheEnabled {
+		CreateCache(".appimage.json", data, CacheEnabled)
+	}
 	close(AppImages)
 	defer wg.Done()
 
@@ -131,7 +141,7 @@ func SearchForApplication(PackageName string) {
 	helpers.BgSuccessMessage(fmt.Sprintf("Found %s application!", strconv.Itoa(len(Applications))))
 	for i := 0; i < len(Applications); i++ {
 		var app types.BaseApplication = Applications[i]
-		helpers.BgInfoMessage(strconv.Itoa(i), app.Name, string(app.Type))
+		color.New(color.BgBlue, color.Bold).Printf("%s) %s - %s \n", strconv.Itoa(i), app.Name, string(app.Type))
 	}
 	helpers.BgSuccessMessage("Please select an application: ")
 	var SelectedAppIndex int
