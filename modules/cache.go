@@ -39,12 +39,12 @@ func CacheIsExist(CacheType types.Type) bool {
 	_, err := os.Stat(File)
 	log.Printf("Check cache of %s: %s", File, err)
 
-	if os.IsNotExist(err) {
-		return false
+	if err == nil {
+		return true
 
 	}
 
-	return true
+	return false
 }
 
 func CachesExists() bool {

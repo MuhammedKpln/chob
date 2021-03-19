@@ -24,25 +24,30 @@ var CacheEnabled *bool
 
 func FetchApplications(cache *bool) {
 	CacheEnabled = cache
+	fmt.Println(CachesExists())
 	if *CacheEnabled || CachesExists() {
-		AppImageCache := LoadCache(types.AppImageType)
-		FlatpakCache := LoadCache(types.FlatpakType)
-		SnapCache := LoadCache(types.SnapType)
 
-		var AppImagesApps types.AppImage
-		json.Unmarshal(AppImageCache, &AppImagesApps)
+		if CachesExists() {
+			AppImageCache := LoadCache(types.AppImageType)
+			FlatpakCache := LoadCache(types.FlatpakType)
+			SnapCache := LoadCache(types.SnapType)
 
-		var FlatpakApps types.Flatpak
-		json.Unmarshal(FlatpakCache, &FlatpakApps)
+			var AppImagesApps types.AppImage
+			json.Unmarshal(AppImageCache, &AppImagesApps)
 
-		var SnapApps types.Snap
-		json.Unmarshal(SnapCache, &SnapApps)
+			var FlatpakApps types.Flatpak
+			json.Unmarshal(FlatpakCache, &FlatpakApps)
 
-		AppImages <- AppImagesApps
-		Flatpaks <- FlatpakApps
-		Snaps <- SnapApps
+			var SnapApps types.Snap
+			json.Unmarshal(SnapCache, &SnapApps)
 
-		return
+			AppImages <- AppImagesApps
+			Flatpaks <- FlatpakApps
+			Snaps <- SnapApps
+
+			return
+		}
+
 	} else {
 		helpers.BgInfoMessage("⚡ Complaining about slow search results? Try caching results by adding --enableCache argument at the end of your command!")
 	}
