@@ -43,6 +43,12 @@ func main() {
 
 	var LogFile string = path.Join(helpers.ChobPath(), "chob.log")
 
+	_, err := os.ReadDir(helpers.ChobPath())
+
+	if err != nil {
+		os.Mkdir(helpers.ChobPath(), 0777)
+	}
+
 	f, err := os.OpenFile(LogFile, os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
 	if err != nil {
 		log.Fatalf("error opening file: %v", err)
