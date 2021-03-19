@@ -8,15 +8,21 @@ import (
 	"log"
 	"os"
 	"path"
-	"strings"
 
 	"github.com/fatih/color"
 )
 
 func main() {
-	Cache := flag.Bool("enableCache", false, "enableCache")
+	Cache := flag.Bool("enableCache", false, "Enables the cache")
+	CacheDisabled := flag.Bool("disableCache", false, "Disables the cache")
 	flag.Parse()
 	Arg := flag.Arg(0)
+
+	if *CacheDisabled {
+		modules.RemoveCache()
+
+		return
+	}
 
 	if Arg == "check" {
 		if !modules.IsUpdated() {
@@ -39,7 +45,13 @@ func main() {
 		return
 	}
 
-	AskForRemoveOlderVersion()
+	LogInit()
+
+	go modules.FetchApplications(Cache)
+	modules.SearchForApplication(Arg)
+}
+
+func LogInit() {
 
 	var LogFile string = path.Join(helpers.ChobPath(), "chob.log")
 
@@ -55,19 +67,4 @@ func main() {
 	}
 	defer f.Close()
 	log.SetOutput(f)
-
-	go modules.FetchApplications(Cache)
-	modules.SearchForApplication(Arg)
-}
-
-func AskForRemoveOlderVersion() {
-	helpers.BgInfoMessage("Did u use Chob before? [y/n] ")
-	var IsUsed string
-	fmt.Scanln(&IsUsed)
-
-	if strings.ToLower(IsUsed) == "y" {
-		helpers.BgDangerMessage(fmt.Sprintf("Please remove your old Chob folder, located at: %s", helpers.ChobPath()))
-		os.Exit(0)
-	}
-
 }

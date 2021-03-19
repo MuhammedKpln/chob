@@ -85,3 +85,7 @@ func LoadCache(CacheType types.Type) []byte {
 	return file
 
 }
+
+func RemoveCache() {
+	os.RemoveAll(path.Join(helpers.ChobPath()))
+}
