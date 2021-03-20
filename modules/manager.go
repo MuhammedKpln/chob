@@ -24,7 +24,6 @@ var CacheEnabled *bool
 
 func FetchApplications(cache *bool) {
 	CacheEnabled = cache
-	fmt.Println(CachesExists())
 	if *CacheEnabled || CachesExists() {
 
 		if CachesExists() {
