@@ -25,8 +25,6 @@ func main() {
 
 	if *CacheDisabled {
 		modules.RemoveCache()
-
-		return
 	}
 
 	if Arg == "check" {
@@ -52,7 +50,8 @@ func main() {
 
 	LogInit()
 
-	go modules.FetchApplications(Cache)
+	go modules.FetchApplications(Arg, Cache)
+	modules.CombineResults(Arg)
 	modules.SearchForApplication(Arg)
 }
 

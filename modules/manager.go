@@ -11,7 +11,6 @@ import (
 	"os/exec"
 	"strconv"
 	"strings"
-	"sync"
 
 	"github.com/fatih/color"
 )
@@ -22,46 +21,41 @@ var Flatpaks = make(chan types.Flatpak)
 var Applications []types.BaseApplication
 var CacheEnabled *bool
 
-func FetchApplications(cache *bool) {
+func FetchApplications(PackageName string, cache *bool) {
 	CacheEnabled = cache
 	if *CacheEnabled || CachesExists() {
 
-		if CachesExists() {
-			AppImageCache := LoadCache(types.AppImageType)
-			FlatpakCache := LoadCache(types.FlatpakType)
-			SnapCache := LoadCache(types.SnapType)
+		AppImageCache := LoadCache(types.AppImageType)
+		FlatpakCache := LoadCache(types.FlatpakType)
+		SnapCache := LoadCache(types.SnapType)
 
-			var AppImagesApps types.AppImage
-			json.Unmarshal(AppImageCache, &AppImagesApps)
+		var AppImagesApps types.AppImage
+		json.Unmarshal(AppImageCache, &AppImagesApps)
 
-			var FlatpakApps types.Flatpak
-			json.Unmarshal(FlatpakCache, &FlatpakApps)
+		var FlatpakApps types.Flatpak
+		json.Unmarshal(FlatpakCache, &FlatpakApps)
 
-			var SnapApps types.Snap
-			json.Unmarshal(SnapCache, &SnapApps)
+		var SnapApps types.Snap
+		json.Unmarshal(SnapCache, &SnapApps)
 
-			AppImages <- AppImagesApps
-			Flatpaks <- FlatpakApps
-			Snaps <- SnapApps
+		AppImages <- AppImagesApps
+		Flatpaks <- FlatpakApps
+		Snaps <- SnapApps
 
-			return
-		}
+		return
 
 	} else {
 		helpers.BgInfoMessage("⚡ Complaining about slow search results? Try caching results by adding --enableCache argument at the end of your command!")
 	}
 
-	var wg sync.WaitGroup
-	wg.Add(3)
-
-	go FetchAppImages(&wg)
-	go FetchFlatpaks(&wg)
-	go FetchSnaps(&wg)
-	wg.Wait()
+	helpers.BgInfoMessage("Fetching applications..")
+	go FetchAppImages()
+	go FetchFlatpaks()
+	go FetchSnaps()
 
 }
 
-func FetchFlatpaks(wg *sync.WaitGroup) {
+func FetchFlatpaks() {
 	var FetchUrl string = "https://flathub.org/api/v1/apps/"
 	resp, err := http.Get(FetchUrl)
 
@@ -77,16 +71,14 @@ func FetchFlatpaks(wg *sync.WaitGroup) {
 	json.Unmarshal(data, &apps)
 
 	Flatpaks <- apps
-
 	if *CacheEnabled {
 		CreateCache(".flathub.json", data, CacheEnabled)
 	}
+	defer close(Flatpaks)
 
-	close(Flatpaks)
-	defer wg.Done()
 }
 
-func FetchSnaps(wg *sync.WaitGroup) {
+func FetchSnaps() {
 	var FetchUrl string = "https://raw.githubusercontent.com/MuhammedKpln/chob/master/snapcraft.json"
 
 	resp, err := http.Get(FetchUrl)
@@ -107,12 +99,11 @@ func FetchSnaps(wg *sync.WaitGroup) {
 	if *CacheEnabled {
 		CreateCache(".snap.json", data, CacheEnabled)
 	}
+	defer close(Snaps)
 
-	close(Snaps)
-	defer wg.Done()
 }
 
-func FetchAppImages(wg *sync.WaitGroup) {
+func FetchAppImages() {
 	var FetchUrl string = "https://appimage.github.io/feed.json"
 
 	resp, err := http.Get(FetchUrl)
@@ -127,20 +118,29 @@ func FetchAppImages(wg *sync.WaitGroup) {
 
 	var apps types.AppImage
 	json.Unmarshal(data, &apps)
+
 	AppImages <- apps
 
 	if *CacheEnabled {
 		CreateCache(".appimage.json", data, CacheEnabled)
 	}
-	close(AppImages)
-	defer wg.Done()
+	defer close(AppImages)
 
 }
 
-func SearchForApplication(PackageName string) {
+func CombineResults(PackageName string) {
 	SearchInsideAppImages(PackageName)
 	SearchInsideFlatpaks(PackageName)
 	SearchInsideSnaps(PackageName)
+}
+
+func SearchForApplication(PackageName string) {
+
+	if len(Applications) < 1 {
+		helpers.BgDangerMessage(fmt.Sprintf("Could not find any application: %s", PackageName))
+
+		return
+	}
 
 	helpers.BgSuccessMessage(fmt.Sprintf("Found %s application!", strconv.Itoa(len(Applications))))
 	for i := 0; i < len(Applications); i++ {
@@ -167,8 +167,14 @@ func SearchForApplication(PackageName string) {
 		fmt.Scanln(&InstallAppImage)
 
 		if strings.ToLower(InstallAppImage) == "y" {
-			DownloadAppImage(SelectedApp.RepoUrl, SelectedApp.Name)
-			return
+			if SelectedApp.RepoUrl != "" {
+				DownloadAppImage(SelectedApp.RepoUrl, SelectedApp.Name)
+
+				return
+			} else {
+				helpers.BgDangerMessage("Could not found any download links..")
+			}
+
 		}
 
 	}
@@ -187,13 +193,18 @@ func SearchInsideAppImages(PackageName string) {
 
 		RemotePackageName := strings.ToLower(App.Name)
 		PackageName := strings.ToLower(PackageName)
-
+		var RepoUrl string
 		if strings.Contains(RemotePackageName, PackageName) {
+
+			if len(App.Links) > 0 {
+				RepoUrl = App.Links[1].Url
+			}
+
 			app := types.BaseApplication{
 				Name:    App.Name,
 				Url:     "https://appimage.github.io/" + App.Name,
 				Type:    types.AppImageType,
-				RepoUrl: App.Links[1].Url,
+				RepoUrl: RepoUrl,
 			}
 
 			Applications = append(Applications, app)
