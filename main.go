@@ -13,10 +13,15 @@ import (
 )
 
 func main() {
-	Cache := flag.Bool("enableCache", false, "Enables the cache")
-	CacheDisabled := flag.Bool("disableCache", false, "Disables the cache")
+	Command := flag.NewFlagSet(flag.Arg(0), flag.ExitOnError)
+	Cache := Command.Bool("enableCache", false, "Enables the cache")
+	CacheDisabled := Command.Bool("disableCache", false, "Disables the cache")
 	flag.Parse()
 	Arg := flag.Arg(0)
+
+	if Arg != "" {
+		Command.Parse(os.Args[2:])
+	}
 
 	if *CacheDisabled {
 		modules.RemoveCache()
