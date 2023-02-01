@@ -71,7 +71,6 @@ func FetchFlatpaks() {
 
 	var apps types.Flatpak
 	json.Unmarshal(data, &apps)
-	fmt.Println("qwe")
 	
 	Flatpaks <- apps
 	if *CacheEnabled {
