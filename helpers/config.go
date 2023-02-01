@@ -9,7 +9,7 @@ var VERSION string = "1.0.0"
 
 func ChobPath() string {
 	usr, _ := user.Current()
-	var Path string = path.Join(usr.HomeDir, "chob")
+	var Path string = path.Join(usr.HomeDir, ".chob")
 
 	return Path
 }
