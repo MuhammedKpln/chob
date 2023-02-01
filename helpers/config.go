@@ -13,3 +13,10 @@ func ChobPath() string {
 
 	return Path
 }
+
+func ApplicationsPath() string {
+	usr, _ := user.Current()
+	var Path string = path.Join(usr.HomeDir, "Applications")
+
+	return Path
+}

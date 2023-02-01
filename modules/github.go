@@ -53,7 +53,7 @@ func Download(DownloadUrl string, FileName string) {
 		return
 	}
 
-	var File string = path.Join(helpers.ChobPath(), FileName)
+	var File string = path.Join(helpers.ApplicationsPath(), FileName)
 	out, err := os.Create(File)
 	defer out.Close()
 

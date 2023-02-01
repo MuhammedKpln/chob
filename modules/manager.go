@@ -8,6 +8,7 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"os"
 	"os/exec"
 	"strconv"
 	"strings"
@@ -53,10 +54,11 @@ func FetchApplications(PackageName string, cache *bool) {
 	go FetchFlatpaks()
 	go FetchSnaps()
 
+
 }
 
 func FetchFlatpaks() {
-	var FetchUrl string = "https://flathub.org/api/v1/apps/"
+	var FetchUrl string = "https://flathub.org/api/v1/apps"
 	resp, err := http.Get(FetchUrl)
 
 	if err != nil {
@@ -69,7 +71,8 @@ func FetchFlatpaks() {
 
 	var apps types.Flatpak
 	json.Unmarshal(data, &apps)
-
+	fmt.Println("qwe")
+	
 	Flatpaks <- apps
 	if *CacheEnabled {
 		CreateCache(".flathub.json", data, CacheEnabled)
@@ -95,7 +98,6 @@ func FetchSnaps() {
 	json.Unmarshal(data, &apps)
 
 	Snaps <- apps
-
 	if *CacheEnabled {
 		CreateCache(".snap.json", data, CacheEnabled)
 	}
@@ -119,8 +121,10 @@ func FetchAppImages() {
 	var apps types.AppImage
 	json.Unmarshal(data, &apps)
 
-	AppImages <- apps
 
+
+	AppImages <- apps
+	
 	if *CacheEnabled {
 		CreateCache(".appimage.json", data, CacheEnabled)
 	}
@@ -259,6 +263,12 @@ func DownloadAppImage(RepoUrl string, AppName string) {
 	LatestRelease := GetTheLatestRelease(RepoUrl)
 	LatestReleaseAssets := LatestRelease.Assets
 	var DownloadUrl string
+	var ApplicationFolderExists = CheckIfApplicationsFolderExists()
+
+
+	if !ApplicationFolderExists {
+		CreateApplicationsFolder()
+	}
 
 	if len(LatestReleaseAssets) > 0 {
 		helpers.BgInfoMessage("Found latest release, trying to download..")
@@ -266,11 +276,34 @@ func DownloadAppImage(RepoUrl string, AppName string) {
 
 	for i := 0; i < len(LatestReleaseAssets); i++ {
 		if strings.HasSuffix(LatestReleaseAssets[i].Name, ".appimage") || strings.HasSuffix(LatestReleaseAssets[i].Name, ".AppImage") {
+
 			DownloadUrl = LatestReleaseAssets[i].BrowserDownloadURL
 		}
 	}
 
 	Download(DownloadUrl, AppName+".AppImage")
 
-	helpers.BgSuccessMessage(fmt.Sprintf("Successfully downloaded %s to %s", AppName, helpers.ChobPath()))
+	helpers.BgSuccessMessage(fmt.Sprintf("Successfully downloaded %s to %s", AppName, helpers.ApplicationsPath()))
+}
+
+
+func  CheckIfApplicationsFolderExists() bool {
+	stat, err := os.Stat(helpers.ApplicationsPath());
+	
+	if err == nil  && stat.IsDir() {
+		if os.IsNotExist(err) {
+			return false
+		} 
+
+
+		return true
+	}
+
+	return false
+}
+
+func  CreateApplicationsFolder()  {
+    if err := os.Mkdir(helpers.ApplicationsPath(), os.ModePerm); err != nil {
+        log.Fatal(err)
+    }
 }
