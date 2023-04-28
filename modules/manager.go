@@ -24,7 +24,7 @@ var CacheEnabled *bool
 
 func FetchApplications(PackageName string, cache *bool) {
 	CacheEnabled = cache
-	if *CacheEnabled || CachesExists() {
+	if  CachesExists() {
 
 		AppImageCache := LoadCache(types.AppImageType)
 		FlatpakCache := LoadCache(types.FlatpakType)
@@ -81,11 +81,20 @@ func FetchFlatpaks() {
 }
 
 func FetchSnaps() {
-	var FetchUrl string = "https://raw.githubusercontent.com/MuhammedKpln/chob/master/snapcraft.json"
+	var FetchUrl string = "https://api.snapcraft.io/api/v1/snaps/names"
 
-	resp, err := http.Get(FetchUrl)
+	client := http.Client{}
 
-	if err != nil {
+	req , err := http.NewRequest("GET", FetchUrl, nil)
+	req.Header = http.Header{
+		"X-Ubuntu-Series": {"16"},
+		"X-Ubuntu-Architecture": {"amd64"},
+	}
+
+	resp, respError := client.Do(req)
+
+
+	if respError != nil || err != nil{
 		log.Fatalln("Could not fetch snap url", FetchUrl)
 	}
 
@@ -97,6 +106,7 @@ func FetchSnaps() {
 	json.Unmarshal(data, &apps)
 
 	Snaps <- apps
+
 	if *CacheEnabled {
 		CreateCache(".snap.json", data, CacheEnabled)
 	}
@@ -123,7 +133,7 @@ func FetchAppImages() {
 
 
 	AppImages <- apps
-	
+
 	if *CacheEnabled {
 		CreateCache(".appimage.json", data, CacheEnabled)
 	}
@@ -221,13 +231,13 @@ func SearchInsideSnaps(PackageName string) {
 	for i := 0; i < len(_Snaps.Embedded.ClickindexPackage); i++ {
 		App := _Snaps.Embedded.ClickindexPackage[i]
 
-		RemotePackageName := strings.ToLower(App.Name)
+		RemotePackageName := strings.ToLower(App.PackageName)
 		PackageName := strings.ToLower(PackageName)
 
 		if strings.Contains(RemotePackageName, PackageName) {
 			var URL string = fmt.Sprintf("https://snapcraft.io/%s", App.PackageName)
 			app := types.BaseApplication{
-				Name: App.Name,
+				Name: App.Title,
 				Url:  URL,
 				Type: types.SnapType,
 			}
