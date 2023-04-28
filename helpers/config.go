@@ -5,7 +5,7 @@ import (
 	"path"
 )
 
-var VERSION string = "1.0.0"
+var VERSION string = "1.2.1"
 
 func ChobPath() string {
 	usr, _ := user.Current()
